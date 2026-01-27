@@ -3,6 +3,7 @@ const { StorageManager } = require('../../utils/storage-manager.js');
 Page({
   data: {
     step: 1,
+    isEditMode: false,
     formData: {
       salary: '15000',
       workdays: [1, 2, 3, 4, 5], // 0-6 表示周日到周六
@@ -32,19 +33,45 @@ Page({
       { label: '六', value: 6, selected: false },
       { label: '日', value: 0, selected: false }
     ],
-    hasRestSegment: true,
+    displaySegments: [], // 用于显示的时段列表（包含工作和休息）
     nextSegmentId: 3
   },
 
-  onLoad() {
-    // 检查是否已经完成过设置
-    const hasSetup = wx.getStorageSync('hasSetup');
-    if (hasSetup) {
-      // 已完成设置,跳转到首页
-      wx.switchTab({
-        url: '/pages/home/home'
-      });
+  onLoad(options) {
+    // 检查是否是编辑模式
+    const isEdit = options && options.edit === 'true';
+
+    if (!isEdit) {
+      // 非编辑模式：检查是否已经完成过设置
+      const hasSetup = wx.getStorageSync('hasSetup');
+      if (hasSetup) {
+        // 已完成设置,跳转到首页
+        wx.switchTab({
+          url: '/pages/home/home'
+        });
+        return;
+      }
+    } else {
+      // 编辑模式：加载已有配置
+      const config = StorageManager.getUserConfig();
+      if (config) {
+        // 更新weekdays的selected状态
+        const weekdays = this.data.weekdays.map(day => ({
+          ...day,
+          selected: config.workdays.includes(day.value)
+        }));
+
+        this.setData({
+          formData: config,
+          weekdays: weekdays,
+          isEditMode: true,
+          step: 1 // 编辑模式也从第一步开始
+        });
+      }
     }
+
+    // 初始化显示时段列表
+    this.updateRestSegments();
   },
 
   // 月薪输入
@@ -115,30 +142,41 @@ Page({
 
   // 更新休息间隙显示
   updateRestSegments() {
-    const segments = this.data.formData.segments;
+    const workSegments = this.data.formData.segments;
 
-    // 按开始时间排序
-    const sortedSegments = [...segments].sort((a, b) => {
+    // 按开始时间排序工作时段
+    const sortedWorkSegments = [...workSegments].sort((a, b) => {
       const aStart = this.timeToMinutes(a.startTime);
       const bStart = this.timeToMinutes(b.startTime);
       return aStart - bStart;
     });
 
-    // 检查是否有间隙
-    let hasGap = false;
-    for (let i = 0; i < sortedSegments.length - 1; i++) {
-      const currentEnd = this.timeToMinutes(sortedSegments[i].endTime);
-      const nextStart = this.timeToMinutes(sortedSegments[i + 1].startTime);
+    // 生成包含休息时段的完整列表
+    const displaySegments = [];
+    for (let i = 0; i < sortedWorkSegments.length; i++) {
+      // 添加工作时段
+      displaySegments.push(sortedWorkSegments[i]);
 
-      // 如果间隙大于0分钟，说明有休息时间
-      if (nextStart > currentEnd) {
-        hasGap = true;
-        break;
+      // 检查与下一个工作时段之间是否有间隙
+      if (i < sortedWorkSegments.length - 1) {
+        const currentEnd = this.timeToMinutes(sortedWorkSegments[i].endTime);
+        const nextStart = this.timeToMinutes(sortedWorkSegments[i + 1].startTime);
+
+        // 如果间隙大于0分钟，添加休息时段
+        if (nextStart > currentEnd) {
+          displaySegments.push({
+            id: `rest-${i}`,
+            type: 'rest',
+            name: '休息时段',
+            startTime: sortedWorkSegments[i].endTime,
+            endTime: sortedWorkSegments[i + 1].startTime
+          });
+        }
       }
     }
 
     this.setData({
-      hasRestSegment: hasGap
+      displaySegments: displaySegments
     });
   },
 
@@ -249,18 +287,31 @@ Page({
     const success = StorageManager.saveUserConfig(this.data.formData);
 
     if (success) {
+      // 只有首次设置时才保存首次工作日期
+      if (!this.data.isEditMode) {
+        const today = StorageManager.getTodayKey();
+        const existingFirstWorkDate = StorageManager.getFirstWorkDate();
+        if (!existingFirstWorkDate) {
+          StorageManager.setFirstWorkDate(today);
+        }
+      }
+
       wx.setStorageSync('hasSetup', true);
 
       wx.showToast({
-        title: '设置完成',
+        title: this.data.isEditMode ? '修改成功' : '设置完成',
         icon: 'success'
       });
 
-      // 跳转到首页
+      // 跳转到首页或返回上一页
       setTimeout(() => {
-        wx.switchTab({
-          url: '/pages/home/home'
-        });
+        if (this.data.isEditMode) {
+          wx.navigateBack();
+        } else {
+          wx.switchTab({
+            url: '/pages/home/home'
+          });
+        }
       }, 1500);
     } else {
       wx.showToast({

@@ -69,56 +69,54 @@
 
         <!-- 时段列表 -->
         <view class="segments-list">
-          <view
-            class="segment-item work-segment"
-            wx:for="{{formData.segments}}"
-            wx:key="id"
-            wx:if="{{item.type === 'work'}}"
-          >
-            <view class="segment-header">
-              <t-tag theme="primary" size="small">工作</t-tag>
-              <view class="segment-delete" bindtap="deleteSegment" data-id="{{item.id}}">
-                <text class="delete-icon">×</text>
+          <block wx:for="{{displaySegments}}" wx:key="id">
+            <!-- 工作时段 -->
+            <view class="segment-item work-segment" wx:if="{{item.type === 'work'}}">
+              <view class="segment-header">
+                <t-tag theme="primary" size="small">工作</t-tag>
+                <view class="segment-delete" bindtap="deleteSegment" data-id="{{item.id}}">
+                  <text class="delete-icon">×</text>
+                </view>
+              </view>
+              <input
+                class="segment-name-input"
+                value="{{item.name}}"
+                placeholder="时段名称"
+                bindinput="onSegmentNameInput"
+                data-id="{{item.id}}"
+              />
+              <view class="segment-time">
+                <picker
+                  mode="time"
+                  value="{{item.startTime}}"
+                  bindchange="onSegmentTimeChange"
+                  data-id="{{item.id}}"
+                  data-type="start"
+                >
+                  <view class="time-picker">{{item.startTime}}</view>
+                </picker>
+                <text class="time-separator">至</text>
+                <picker
+                  mode="time"
+                  value="{{item.endTime}}"
+                  bindchange="onSegmentTimeChange"
+                  data-id="{{item.id}}"
+                  data-type="end"
+                >
+                  <view class="time-picker">{{item.endTime}}</view>
+                </picker>
               </view>
             </view>
-            <input
-              class="segment-name-input"
-              value="{{item.name}}"
-              placeholder="时段名称"
-              bindinput="onSegmentNameInput"
-              data-id="{{item.id}}"
-            />
-            <view class="segment-time">
-              <picker
-                mode="time"
-                value="{{item.startTime}}"
-                bindchange="onSegmentTimeChange"
-                data-id="{{item.id}}"
-                data-type="start"
-              >
-                <view class="time-picker">{{item.startTime}}</view>
-              </picker>
-              <text class="time-separator">至</text>
-              <picker
-                mode="time"
-                value="{{item.endTime}}"
-                bindchange="onSegmentTimeChange"
-                data-id="{{item.id}}"
-                data-type="end"
-              >
-                <view class="time-picker">{{item.endTime}}</view>
-              </picker>
-            </view>
-          </view>
 
-          <!-- 自动休息间隙 -->
-          <view class="segment-item rest-segment" wx:if="{{hasRestSegment}}">
-            <view class="segment-header">
-              <t-tag theme="success" size="small" variant="light">休息</t-tag>
-              <text class="auto-label">自动生成</text>
+            <!-- 休息时段 -->
+            <view class="segment-item rest-segment" wx:if="{{item.type === 'rest'}}">
+              <view class="segment-header">
+                <t-tag theme="success" size="small" variant="light">休息</t-tag>
+                <text class="auto-label">自动生成</text>
+              </view>
+              <text class="rest-desc">{{item.startTime}} - {{item.endTime}} · 休息时间</text>
             </view>
-            <text class="rest-desc">12:00 - 14:00 · 午休时间</text>
-          </view>
+          </block>
         </view>
 
         <!-- 添加时段按钮 -->

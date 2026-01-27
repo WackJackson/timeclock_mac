@@ -1,28 +1,30 @@
+const { StorageManager } = require('../../utils/storage-manager.js');
+
 Page({
   data: {
-    workYears: '1年3个月',
-    recordDays: 286,
-    monthlySalary: '15,000',
-    totalEarned: '186.5k',
-    workdays: '周一至周五',
-    worktime: '09:00-18:00',
+    workYears: '0天',
+    recordDays: 0,
+    monthlySalary: '0',
+    totalEarned: '0',
+    workdays: '--',
+    worktime: '--',
     dimensionTab: 'day',
-    totalHours: 7,
+    totalHours: 0,
     modeStats: {
       normal: {
-        hours: 4.2,
-        percent: 60,
-        amount: '181.44'
+        hours: 0,
+        percent: 0,
+        amount: '0.00'
       },
       burnout: {
-        hours: 1.75,
-        percent: 25,
-        amount: '75.60'
+        hours: 0,
+        percent: 0,
+        amount: '0.00'
       },
       slack: {
-        hours: 1.05,
-        percent: 15,
-        amount: '45.36'
+        hours: 0,
+        percent: 0,
+        amount: '0.00'
       }
     }
   },
@@ -31,10 +33,117 @@ Page({
     this.loadUserData();
   },
 
+  onShow() {
+    // 每次显示页面时重新加载
+    this.loadUserData();
+  },
+
   // 加载用户数据
   loadUserData() {
-    // 这里应该从存储中加载用户数据
-    // 暂时使用示例数据
+    const config = StorageManager.getUserConfig();
+    if (!config) {
+      return;
+    }
+
+    // 格式化月薪
+    const salary = parseFloat(config.salary || 0);
+    this.setData({
+      monthlySalary: this.formatMoney(salary)
+    });
+
+    // 格式化工作日
+    const weekdayNames = ['日', '一', '二', '三', '四', '五', '六'];
+    const workdayNames = config.workdays.sort((a, b) => a - b).map(day => weekdayNames[day]);
+    const workdaysText = workdayNames.length > 0 ? `周${workdayNames.join('、')}` : '--';
+    this.setData({
+      workdays: workdaysText
+    });
+
+    // 格式化工作时段
+    if (config.segments && config.segments.length > 0) {
+      const sortedSegments = [...config.segments].sort((a, b) => {
+        return a.startTime.localeCompare(b.startTime);
+      });
+      const firstSegment = sortedSegments[0];
+      const lastSegment = sortedSegments[sortedSegments.length - 1];
+      this.setData({
+        worktime: `${firstSegment.startTime}-${lastSegment.endTime}`
+      });
+    }
+
+    // 计算工龄
+    this.calculateWorkTenure();
+
+    // 计算累计收入和记录天数
+    this.calculateTotalStats();
+
+    // 加载当前维度的统计数据
+    this.loadStatsData(this.data.dimensionTab);
+  },
+
+  // 计算工龄
+  calculateWorkTenure() {
+    const firstWorkDate = StorageManager.getFirstWorkDate();
+    if (!firstWorkDate) {
+      this.setData({ workYears: '0天' });
+      return;
+    }
+
+    const start = new Date(firstWorkDate);
+    const now = new Date();
+    const diffTime = Math.abs(now - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      this.setData({ workYears: '今天' });
+    } else if (diffDays < 30) {
+      this.setData({ workYears: `${diffDays}天` });
+    } else if (diffDays < 365) {
+      const months = Math.floor(diffDays / 30);
+      const days = diffDays % 30;
+      this.setData({
+        workYears: days > 0 ? `${months}个月${days}天` : `${months}个月`
+      });
+    } else {
+      const years = Math.floor(diffDays / 365);
+      const months = Math.floor((diffDays % 365) / 30);
+      this.setData({
+        workYears: months > 0 ? `${years}年${months}个月` : `${years}年`
+      });
+    }
+  },
+
+  // 计算累计统计数据
+  calculateTotalStats() {
+    const allRecords = StorageManager.getWorkRecords();
+    const recordDays = Object.keys(allRecords).length;
+
+    let totalEarned = 0;
+    Object.values(allRecords).forEach(dayRecords => {
+      if (Array.isArray(dayRecords)) {
+        dayRecords.forEach(record => {
+          totalEarned += parseFloat(record.amount || 0);
+        });
+      }
+    });
+
+    this.setData({
+      recordDays: recordDays,
+      totalEarned: this.formatKMoney(totalEarned)
+    });
+  },
+
+  // 格式化金额（K单位）
+  formatKMoney(amount) {
+    if (amount >= 1000) {
+      return `${(amount / 1000).toFixed(1)}k`;
+    }
+    return amount.toFixed(2);
+  },
+
+  // 格式化金额
+  formatMoney(amount) {
+    return amount.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   },
 
   // 切换时间维度
@@ -49,35 +158,58 @@ Page({
 
   // 加载统计数据
   loadStatsData(dimension) {
-    // 这里应该根据维度加载不同的数据
+    // TODO: 根据维度加载不同的数据
+    // 这里暂时使用示例数据
     console.log('Loading stats for:', dimension);
   },
 
   // 编辑月薪
   editSalary() {
-    wx.showToast({
-      title: '编辑月薪功能开发中',
-      icon: 'none'
+    const config = StorageManager.getUserConfig();
+    const currentSalary = config ? config.salary : '15000';
+
+    wx.showModal({
+      title: '月薪设置',
+      editable: true,
+      placeholderText: '请输入月薪',
+      content: currentSalary,
+      success: (res) => {
+        if (res.confirm && res.content) {
+          const newSalary = parseFloat(res.content);
+          if (!isNaN(newSalary) && newSalary > 0) {
+            const updatedConfig = {
+              ...config,
+              salary: res.content
+            };
+            StorageManager.saveUserConfig(updatedConfig);
+            this.loadUserData();
+            wx.showToast({
+              title: '修改成功',
+              icon: 'success'
+            });
+          } else {
+            wx.showToast({
+              title: '请输入有效金额',
+              icon: 'none'
+            });
+          }
+        }
+      }
     });
-    // TODO: 跳转到月薪设置页面
   },
 
   // 编辑工作日
   editWorkdays() {
-    wx.showToast({
-      title: '编辑工作日功能开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/setup/setup?edit=true'
     });
-    // TODO: 跳转到工作日设置页面
   },
 
   // 编辑工作时段
   editWorktime() {
-    wx.showToast({
-      title: '编辑时段功能开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/setup/setup?edit=true'
     });
-    // TODO: 跳转到时段设置页面
   },
 
   // 提醒设置

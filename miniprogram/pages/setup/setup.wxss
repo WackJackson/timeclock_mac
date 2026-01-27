@@ -133,6 +133,7 @@
   border-radius: 24rpx;
   border: 4rpx solid transparent;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .salary-input:focus {

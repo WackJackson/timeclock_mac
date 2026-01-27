@@ -10,7 +10,8 @@ const STORAGE_KEYS = {
   ACTIVE_WISH: 'activeWish',
   HAS_SETUP: 'hasSetup',
   CURRENT_MODE: 'currentMode',
-  TODAY_EARNINGS: 'todayEarnings'
+  TODAY_EARNINGS: 'todayEarnings',
+  FIRST_WORK_DATE: 'firstWorkDate'
 };
 
 class StorageManager {
@@ -262,6 +263,31 @@ class StorageManager {
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * 保存首次工作日期
+   */
+  static setFirstWorkDate(date) {
+    try {
+      wx.setStorageSync(STORAGE_KEYS.FIRST_WORK_DATE, date);
+      return true;
+    } catch (e) {
+      console.error('保存首次工作日期失败:', e);
+      return false;
+    }
+  }
+
+  /**
+   * 获取首次工作日期
+   */
+  static getFirstWorkDate() {
+    try {
+      return wx.getStorageSync(STORAGE_KEYS.FIRST_WORK_DATE);
+    } catch (e) {
+      console.error('获取首次工作日期失败:', e);
+      return null;
+    }
   }
 
   /**

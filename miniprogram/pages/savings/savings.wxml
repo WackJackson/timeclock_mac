@@ -80,4 +80,59 @@
   <view class="fab-button" bindtap="createWish">
     <text class="fab-icon">+</text>
   </view>
+
+  <!-- 创建愿望对话框 -->
+  <t-dialog
+    visible="{{showCreateDialog}}"
+    title="创建攒钱愿望"
+    confirm-btn="创建"
+    cancel-btn="取消"
+    bind:confirm="confirmCreate"
+    bind:cancel="cancelCreate"
+  >
+    <view class="create-dialog-content">
+      <!-- 标题输入 -->
+      <view class="dialog-field">
+        <text class="field-label">愿望名称</text>
+        <input
+          class="field-input"
+          placeholder="例如：AirPods Pro"
+          value="{{newWish.name}}"
+          bindinput="onWishNameInput"
+          maxlength="20"
+        />
+      </view>
+
+      <!-- 金额输入 -->
+      <view class="dialog-field">
+        <text class="field-label">目标金额</text>
+        <view class="amount-input-wrapper">
+          <text class="amount-symbol">¥</text>
+          <input
+            class="field-input amount-input"
+            type="digit"
+            placeholder="0.00"
+            value="{{newWish.amount}}"
+            bindinput="onWishAmountInput"
+          />
+        </view>
+      </view>
+
+      <!-- 图标选择 -->
+      <view class="dialog-field">
+        <text class="field-label">选择图标</text>
+        <view class="emoji-selector">
+          <view
+            class="emoji-item {{newWish.emoji === item ? 'selected' : ''}}"
+            wx:for="{{emojiOptions}}"
+            wx:key="*this"
+            bindtap="selectEmoji"
+            data-emoji="{{item}}"
+          >
+            <text class="emoji-text">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </t-dialog>
 </view>
