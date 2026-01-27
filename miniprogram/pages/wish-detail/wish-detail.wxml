@@ -1,0 +1,110 @@
+<view class="detail-container">
+  <!-- 头部背景 -->
+  <view class="header-bg">
+    <!-- 导航按钮 -->
+    <view class="nav-buttons">
+      <view class="nav-btn" bindtap="goBack">
+        <text class="nav-icon">←</text>
+      </view>
+      <view class="nav-btn" bindtap="showMore">
+        <text class="nav-icon">⋮</text>
+      </view>
+    </view>
+
+    <!-- 愿望信息 -->
+    <view class="wish-header">
+      <view class="wish-icon-large" style="background: {{wishData.color}};">
+        <text class="icon-emoji-large">{{wishData.emoji}}</text>
+      </view>
+      <text class="wish-title">{{wishData.name}}</text>
+      <text class="wish-desc">{{wishData.description}}</text>
+    </view>
+  </view>
+
+  <!-- 进度卡片 -->
+  <view class="progress-card">
+    <view class="progress-header">
+      <text class="progress-label">当前进度</text>
+      <view class="progress-amounts">
+        <text class="amount-current">¥{{wishData.currentAmount}}</text>
+        <text class="amount-separator"> / </text>
+        <text class="amount-target">¥{{wishData.targetAmount}}</text>
+      </view>
+    </view>
+
+    <!-- 圆形进度 -->
+    <view class="circular-progress">
+      <view class="progress-circle">
+        <text class="progress-text">{{wishData.progress}}%</text>
+      </view>
+    </view>
+
+    <!-- 统计信息 -->
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-label">已攒天数</text>
+        <text class="stat-value">{{stats.savedDays}} 天</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-label">预计完成</text>
+        <text class="stat-value">{{stats.estimatedDays}} 天后</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-label">日均速度</text>
+        <text class="stat-value">¥{{stats.dailyAverage}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 资金来源 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">资金来源</text>
+      <text class="section-action" bindtap="viewAllRecords">查看全部</text>
+    </view>
+
+    <view class="records-list">
+      <view class="record-item" wx:for="{{records}}" wx:key="id">
+        <view class="record-icon" style="background: {{item.iconBg}};">
+          <text class="record-emoji">{{item.icon}}</text>
+        </view>
+        <view class="record-info">
+          <view class="record-title-row">
+            <text class="record-name">{{item.segmentName}}</text>
+            <t-tag
+              theme="{{item.modeTheme}}"
+              size="small"
+              variant="light"
+            >
+              {{item.modeName}}
+            </t-tag>
+          </view>
+          <text class="record-time">{{item.date}} {{item.timeRange}}</text>
+        </view>
+        <text class="record-amount" style="color: {{item.amountColor}};">+¥{{item.amount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作按钮 -->
+  <view class="bottom-actions">
+    <t-button
+      theme="primary"
+      size="large"
+      block
+      bindtap="setActive"
+      wx:if="{{wishData.status !== 'active'}}"
+    >
+      设为进行中
+    </t-button>
+    <t-button
+      theme="default"
+      size="large"
+      block
+      bindtap="pauseWish"
+      wx:if="{{wishData.status === 'active'}}"
+    >
+      暂停攒钱
+    </t-button>
+  </view>
+</view>

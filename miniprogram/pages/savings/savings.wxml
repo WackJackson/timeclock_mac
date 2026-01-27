@@ -1,0 +1,83 @@
+<view class="savings-container">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="header-content">
+      <view class="header-title">攒钱观察</view>
+      <view class="header-subtitle">把薪水变成看得见的梦想</view>
+
+      <!-- 总进度 -->
+      <view class="total-progress-card">
+        <text class="total-label">总攒钱进度</text>
+        <text class="total-amount">¥{{totalSaved}}</text>
+        <view class="total-progress-bar">
+          <view class="total-progress-fill" style="width: {{totalProgress}}%;"></view>
+        </view>
+        <text class="total-percent">{{totalProgress}}%</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 愿望列表 -->
+  <view class="wish-list">
+    <view
+      class="wish-card {{item.status === 'active' ? 'active' : ''}}"
+      wx:for="{{wishes}}"
+      wx:key="id"
+      bindtap="goToDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="wish-content">
+        <!-- 图标 -->
+        <view class="wish-icon" style="background: {{item.color}};">
+          <text class="icon-emoji">{{item.emoji}}</text>
+          <view class="check-badge" wx:if="{{item.status === 'completed'}}">
+            <text class="check-icon">✓</text>
+          </view>
+        </view>
+
+        <!-- 信息 -->
+        <view class="wish-info">
+          <!-- 状态标签 -->
+          <view class="wish-tags">
+            <t-tag
+              theme="{{item.status === 'active' ? 'primary' : item.status === 'completed' ? 'success' : 'default'}}"
+              size="small"
+            >
+              {{item.statusText}}
+            </t-tag>
+            <text class="wish-date" wx:if="{{item.completedDate}}">{{item.completedDate}}</text>
+          </view>
+
+          <!-- 名称 -->
+          <text class="wish-name">{{item.name}}</text>
+
+          <!-- 金额 -->
+          <view class="wish-amounts">
+            <text class="current-amount" style="color: {{item.amountColor}};">¥{{item.currentAmount}}</text>
+            <text class="amount-separator"> / </text>
+            <text class="target-amount">¥{{item.targetAmount}}</text>
+          </view>
+
+          <!-- 进度条 -->
+          <view class="wish-progress">
+            <view class="wish-progress-bg">
+              <view
+                class="wish-progress-fill"
+                style="width: {{item.progress}}%; background: {{item.progressColor}};"
+              ></view>
+            </view>
+            <view class="wish-progress-text">
+              <text class="progress-percent" style="color: {{item.progressTextColor}};">{{item.progress}}%</text>
+              <text class="progress-remain" style="color: {{item.remainColor}};">{{item.remainText}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新建按钮 -->
+  <view class="fab-button" bindtap="createWish">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

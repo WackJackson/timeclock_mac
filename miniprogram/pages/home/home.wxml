@@ -1,0 +1,134 @@
+<view class="home-container {{isWorking ? 'working-bg' : 'resting-bg'}}">
+  <!-- 顶部状态指示 -->
+  <view class="status-bar">
+    <view class="flex" style="align-items: center; gap: 16rpx;">
+      <view class="status-dot {{isWorking ? 'working' : 'resting'}}">
+        <view class="pulse-ring" wx:if="{{isWorking}}"></view>
+      </view>
+      <text class="status-text">{{isWorking ? '战斗状态' : '休息中'}}</text>
+    </view>
+    <text class="status-desc">{{currentSegment}}</text>
+  </view>
+
+  <!-- 休息状态装饰 -->
+  <view class="clouds" wx:if="{{!isWorking}}">
+    <view class="cloud cloud-1"></view>
+    <view class="cloud cloud-2"></view>
+  </view>
+
+  <!-- 核心金额展示 -->
+  <view class="money-display">
+    <view class="float-icon" wx:if="{{!isWorking}}">🌸</view>
+    <text class="display-label">{{!isWorking ? '今日已赚' : '今日已赚'}}</text>
+    <view class="money-amount {{isWorking ? 'money-pulse' : ''}}">
+      <text class="amount-main">¥{{todayEarned.integer}}</text>
+      <text class="amount-decimal">.{{todayEarned.decimal}}</text>
+    </view>
+    <text class="display-sub" wx:if="{{isWorking}}">本月秒薪: ¥{{secondSalary}} / 秒</text>
+    <text class="display-sub" wx:if="{{!isWorking}}">{{restMessage}}</text>
+  </view>
+
+  <!-- 工作状态时间统计 -->
+  <view class="time-stats" wx:if="{{!isWorking}}">
+    <view class="stat-item">
+      <view class="stat-dot" style="background: #0052d9;"></view>
+      <text>普通 {{stats.normal}}h</text>
+    </view>
+    <view class="stat-item">
+      <view class="stat-dot" style="background: #ed7b2f;"></view>
+      <text>燃尽 {{stats.burnout}}h</text>
+    </view>
+    <view class="stat-item">
+      <view class="stat-dot" style="background: #00a870;"></view>
+      <text>摸鱼 {{stats.slack}}h</text>
+    </view>
+  </view>
+
+  <!-- 数据维度切换 -->
+  <view class="dimension-tabs">
+    <t-tabs value="{{dimensionTab}}" bind:change="onDimensionChange" theme="tag">
+      <t-tab-panel label="日" value="day" />
+      <t-tab-panel label="周" value="week" />
+      <t-tab-panel label="月" value="month" />
+    </t-tabs>
+  </view>
+
+  <!-- 进度卡片 -->
+  <view class="progress-card">
+    <view class="flex-between mb-12">
+      <text class="card-label">今日进度</text>
+      <text class="progress-percent">{{progress}}%</text>
+    </view>
+    <view class="progress-bar-bg">
+      <view class="progress-bar-fill" style="width: {{progress}}%;"></view>
+    </view>
+    <view class="flex-between text-xs text-secondary" style="margin-top: 16rpx;">
+      <text>{{workStartTime}}</text>
+      <text class="text-success">← 当前：{{currentTime}} {{isWorking ? '工作中' : '休息中'}}</text>
+      <text>{{workEndTime}}</text>
+    </view>
+  </view>
+
+  <!-- 工作状态 - 模式切换 -->
+  <view class="mode-section" wx:if="{{isWorking}}">
+    <text class="section-label">当前模式</text>
+    <view class="mode-buttons">
+      <view
+        class="mode-btn {{currentMode === 'normal' ? 'active' : ''}}"
+        bindtap="switchMode"
+        data-mode="normal"
+      >
+        <text class="mode-icon">⚡</text>
+        <text class="mode-text">普通模式</text>
+      </view>
+      <view
+        class="mode-btn {{currentMode === 'burnout' ? 'active' : ''}}"
+        bindtap="switchMode"
+        data-mode="burnout"
+      >
+        <text class="mode-icon">🔥</text>
+        <text class="mode-text">燃尽模式</text>
+      </view>
+      <view
+        class="mode-btn {{currentMode === 'slack' ? 'active' : ''}}"
+        bindtap="switchMode"
+        data-mode="slack"
+      >
+        <text class="mode-icon">🐟</text>
+        <text class="mode-text">摸鱼模式</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 工作状态 - 倒计时 -->
+  <view class="countdown-section" wx:if="{{isWorking}}">
+    <text class="section-label">倒计时</text>
+    <view class="countdown-grid">
+      <view class="countdown-card" wx:for="{{countdowns}}" wx:key="label">
+        <view class="flex" style="align-items: center; gap: 12rpx; margin-bottom: 8rpx;">
+          <text class="countdown-icon">{{item.icon}}</text>
+          <text class="countdown-label">{{item.label}}</text>
+        </view>
+        <text class="countdown-value">{{item.value}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 休息状态 - 下一时段提示 -->
+  <view class="next-segment-card" wx:if="{{!isWorking && nextSegment}}">
+    <view class="flex" style="align-items: center; gap: 24rpx;">
+      <view class="segment-icon">
+        <text style="font-size: 40rpx;">⏰</text>
+      </view>
+      <view class="flex-1">
+        <text class="segment-hint">下一个时段</text>
+        <text class="segment-name">{{nextSegment.name}}</text>
+        <text class="segment-time">{{nextSegment.startTime}} - {{nextSegment.endTime}}</text>
+      </view>
+      <view style="text-align: right;">
+        <text class="segment-countdown">{{nextSegment.countdown}}</text>
+        <text class="segment-countdown-label">后开始</text>
+      </view>
+    </view>
+  </view>
+</view>

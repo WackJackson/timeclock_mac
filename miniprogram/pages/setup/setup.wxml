@@ -1,0 +1,154 @@
+<view class="setup-container">
+  <!-- 头部 -->
+  <view class="header">
+    <text class="title">欢迎使用</text>
+    <text class="subtitle">完成设置后开启你的时薪观察之旅</text>
+  </view>
+
+  <!-- 进度指示器 -->
+  <view class="progress-indicator">
+    <view class="progress-bars">
+      <view class="progress-bar {{step >= 1 ? 'active' : ''}}"></view>
+      <view class="progress-bar {{step >= 2 ? 'active' : ''}}"></view>
+      <view class="progress-bar {{step >= 3 ? 'active' : ''}}"></view>
+    </view>
+    <text class="progress-text">步骤 {{step}}/3</text>
+  </view>
+
+  <!-- 表单内容 -->
+  <scroll-view class="form-content" scroll-y>
+    <!-- 步骤1: 月薪设置 -->
+    <view class="form-section" wx:if="{{step === 1}}">
+      <view class="form-card">
+        <view class="form-label">
+          <view class="label-icon">💰</view>
+          <text class="label-text">月薪设置</text>
+        </view>
+        <view class="salary-input-wrapper">
+          <text class="currency-symbol">¥</text>
+          <input
+            type="digit"
+            class="salary-input"
+            value="{{formData.salary}}"
+            placeholder="输入月薪"
+            bindinput="onSalaryInput"
+          />
+        </view>
+        <text class="form-hint">建议填写税后实际到手金额</text>
+      </view>
+    </view>
+
+    <!-- 步骤2: 工作日设定 -->
+    <view class="form-section" wx:if="{{step === 2}}">
+      <view class="form-card">
+        <view class="form-label">
+          <view class="label-icon">📅</view>
+          <text class="label-text">工作日设定</text>
+        </view>
+        <view class="weekdays-selector">
+          <view
+            class="weekday-item {{item.selected ? 'selected' : ''}}"
+            wx:for="{{weekdays}}"
+            wx:key="value"
+            bindtap="toggleWeekday"
+            data-value="{{item.value}}"
+          >
+            <text class="weekday-text">{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 步骤3: 时段规划 -->
+    <view class="form-section" wx:if="{{step === 3}}">
+      <view class="form-card">
+        <view class="form-label">
+          <view class="label-icon">⏰</view>
+          <text class="label-text">时段规划</text>
+        </view>
+
+        <!-- 时段列表 -->
+        <view class="segments-list">
+          <view
+            class="segment-item work-segment"
+            wx:for="{{formData.segments}}"
+            wx:key="id"
+            wx:if="{{item.type === 'work'}}"
+          >
+            <view class="segment-header">
+              <t-tag theme="primary" size="small">工作</t-tag>
+              <view class="segment-delete" bindtap="deleteSegment" data-id="{{item.id}}">
+                <text class="delete-icon">×</text>
+              </view>
+            </view>
+            <input
+              class="segment-name-input"
+              value="{{item.name}}"
+              placeholder="时段名称"
+              bindinput="onSegmentNameInput"
+              data-id="{{item.id}}"
+            />
+            <view class="segment-time">
+              <picker
+                mode="time"
+                value="{{item.startTime}}"
+                bindchange="onSegmentTimeChange"
+                data-id="{{item.id}}"
+                data-type="start"
+              >
+                <view class="time-picker">{{item.startTime}}</view>
+              </picker>
+              <text class="time-separator">至</text>
+              <picker
+                mode="time"
+                value="{{item.endTime}}"
+                bindchange="onSegmentTimeChange"
+                data-id="{{item.id}}"
+                data-type="end"
+              >
+                <view class="time-picker">{{item.endTime}}</view>
+              </picker>
+            </view>
+          </view>
+
+          <!-- 自动休息间隙 -->
+          <view class="segment-item rest-segment" wx:if="{{hasRestSegment}}">
+            <view class="segment-header">
+              <t-tag theme="success" size="small" variant="light">休息</t-tag>
+              <text class="auto-label">自动生成</text>
+            </view>
+            <text class="rest-desc">12:00 - 14:00 · 午休时间</text>
+          </view>
+        </view>
+
+        <!-- 添加时段按钮 -->
+        <view class="add-segment-btn" bindtap="addSegment">
+          <text class="add-icon">+</text>
+          <text class="add-text">添加工作时段</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-actions">
+    <t-button
+      wx:if="{{step < 3}}"
+      theme="primary"
+      size="large"
+      block
+      bindtap="nextStep"
+    >
+      下一步
+    </t-button>
+    <t-button
+      wx:if="{{step === 3}}"
+      theme="primary"
+      size="large"
+      block
+      bindtap="completeSetup"
+    >
+      完成设置
+    </t-button>
+  </view>
+</view>

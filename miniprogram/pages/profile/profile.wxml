@@ -1,0 +1,159 @@
+<view class="profile-container">
+  <!-- 头部 -->
+  <view class="profile-header">
+    <view class="user-info">
+      <view class="avatar">😊</view>
+      <view class="user-details">
+        <text class="username">打工人</text>
+        <text class="work-info">工龄 {{workYears}} · 已记录 {{recordDays}} 天</text>
+      </view>
+    </view>
+
+    <!-- 快捷统计 -->
+    <view class="quick-stats">
+      <view class="stat-card">
+        <text class="stat-value">¥{{monthlySalary}}</text>
+        <text class="stat-label">当前月薪</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">¥{{totalEarned}}</text>
+        <text class="stat-label">累计已赚</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 状态统计 -->
+  <view class="stats-section">
+    <view class="stats-card">
+      <view class="stats-header">
+        <text class="stats-title">工作状态统计</text>
+        <!-- 时间维度切换 -->
+        <view class="dimension-tabs">
+          <text
+            class="tab-item {{dimensionTab === 'day' ? 'active' : ''}}"
+            bindtap="switchDimension"
+            data-value="day"
+          >日</text>
+          <text
+            class="tab-item {{dimensionTab === 'week' ? 'active' : ''}}"
+            bindtap="switchDimension"
+            data-value="week"
+          >周</text>
+          <text
+            class="tab-item {{dimensionTab === 'month' ? 'active' : ''}}"
+            bindtap="switchDimension"
+            data-value="month"
+          >月</text>
+          <text
+            class="tab-item {{dimensionTab === 'year' ? 'active' : ''}}"
+            bindtap="switchDimension"
+            data-value="year"
+          >年</text>
+        </view>
+      </view>
+
+      <!-- 环形图和图例 -->
+      <view class="stats-content">
+        <view class="chart-container">
+          <view class="donut-chart">
+            <view class="donut-center">
+              <text class="donut-value">{{totalHours}}h</text>
+              <text class="donut-label">总时长</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="legend-list">
+          <view class="legend-item">
+            <view class="legend-dot" style="background: #0052d9;"></view>
+            <view class="legend-info">
+              <text class="legend-name">普通模式</text>
+              <text class="legend-detail">{{modeStats.normal.hours}}h · {{modeStats.normal.percent}}% · ¥{{modeStats.normal.amount}}</text>
+            </view>
+          </view>
+          <view class="legend-item">
+            <view class="legend-dot" style="background: #ed7b2f;"></view>
+            <view class="legend-info">
+              <text class="legend-name">燃尽模式</text>
+              <text class="legend-detail">{{modeStats.burnout.hours}}h · {{modeStats.burnout.percent}}% · ¥{{modeStats.burnout.amount}}</text>
+            </view>
+          </view>
+          <view class="legend-item">
+            <view class="legend-dot" style="background: #00a870;"></view>
+            <view class="legend-info">
+              <text class="legend-name">摸鱼模式</text>
+              <text class="legend-detail">{{modeStats.slack.hours}}h · {{modeStats.slack.percent}}% · ¥{{modeStats.slack.amount}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 参数设置 -->
+  <view class="settings-section">
+    <text class="section-title">参数设置</text>
+    <t-cell-group theme="card">
+      <t-cell
+        title="月薪设置"
+        note="¥{{monthlySalary}}"
+        arrow
+        left-icon="💰"
+        hover
+        bindtap="editSalary"
+      />
+      <t-cell
+        title="工作日设置"
+        note="{{workdays}}"
+        arrow
+        left-icon="📅"
+        hover
+        bindtap="editWorkdays"
+      />
+      <t-cell
+        title="工作时段"
+        note="{{worktime}}"
+        arrow
+        left-icon="⏰"
+        hover
+        bindtap="editWorktime"
+      />
+    </t-cell-group>
+  </view>
+
+  <!-- 其他设置 -->
+  <view class="settings-section">
+    <text class="section-title">其他</text>
+    <t-cell-group theme="card">
+      <t-cell
+        title="提醒设置"
+        arrow
+        left-icon="🔔"
+        hover
+        bindtap="editNotifications"
+      />
+      <t-cell
+        title="数据导出"
+        arrow
+        left-icon="📊"
+        hover
+        bindtap="exportData"
+      />
+      <t-cell
+        title="帮助与反馈"
+        arrow
+        left-icon="❓"
+        hover
+        bindtap="showHelp"
+      />
+      <t-cell
+        title="关于"
+        note="v1.0.0"
+        arrow
+        left-icon="ℹ️"
+        hover
+        bindtap="showAbout"
+      />
+    </t-cell-group>
+  </view>
+</view>

@@ -1,0 +1,266 @@
+.detail-container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 180rpx;
+}
+
+/* 头部背景 */
+.header-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 96rpx 48rpx 192rpx;
+  position: relative;
+  color: white;
+}
+
+/* 导航按钮 */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 32rpx;
+}
+
+.nav-btn {
+  width: 80rpx;
+  height: 80rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10rpx);
+}
+
+.nav-icon {
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+/* 愿望头部 */
+.wish-header {
+  text-align: center;
+  padding-top: 32rpx;
+}
+
+.wish-icon-large {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 32rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
+  box-shadow: 0 32rpx 64rpx rgba(0, 0, 0, 0.2);
+}
+
+.icon-emoji-large {
+  font-size: 80rpx;
+}
+
+.wish-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: bold;
+  margin-bottom: 8rpx;
+}
+
+.wish-desc {
+  display: block;
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+
+/* 进度卡片 */
+.progress-card {
+  margin: -128rpx 48rpx 32rpx;
+  padding: 48rpx;
+  background: white;
+  border-radius: 32rpx;
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 1;
+}
+
+.progress-header {
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.progress-label {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.progress-amounts {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.amount-current {
+  font-size: 56rpx;
+  font-weight: bold;
+  color: #0052d9;
+}
+
+.amount-separator {
+  margin: 0 16rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.amount-target {
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 圆形进度 */
+.circular-progress {
+  display: flex;
+  justify-content: center;
+  margin: 48rpx 0;
+}
+
+.progress-circle {
+  width: 256rpx;
+  height: 256rpx;
+  border-radius: 50%;
+  border: 16rpx solid #f0f0f0;
+  border-top-color: #0052d9;
+  border-right-color: #0052d9;
+  border-bottom-color: #60a5fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-45deg);
+}
+
+.progress-text {
+  transform: rotate(45deg);
+  font-size: 56rpx;
+  font-weight: bold;
+  color: #0052d9;
+}
+
+/* 统计信息 */
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32rpx;
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.stat-value {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #242424;
+}
+
+/* 章节 */
+.section {
+  padding: 0 48rpx 32rpx;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #242424;
+}
+
+.section-action {
+  font-size: 24rpx;
+  color: #0052d9;
+}
+
+/* 记录列表 */
+.records-list {
+  background: white;
+  border-radius: 32rpx;
+  overflow: hidden;
+}
+
+.record-item {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.record-item:last-child {
+  border-bottom: none;
+}
+
+.record-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.record-emoji {
+  font-size: 36rpx;
+}
+
+.record-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.record-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 4rpx;
+}
+
+.record-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #242424;
+}
+
+.record-time {
+  font-size: 20rpx;
+  color: #999;
+}
+
+.record-amount {
+  font-size: 28rpx;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* 底部操作 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 32rpx 48rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, #f5f5f5 80%, transparent);
+}
