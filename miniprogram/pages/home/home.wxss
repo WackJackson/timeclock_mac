@@ -326,9 +326,42 @@
   overflow: hidden;
 }
 
+/* 覆盖TDesign tabs组件的默认样式 */
+.dimension-tabs .t-tabs {
+  background: transparent !important;
+}
+
+.dimension-tabs .t-tabs__nav {
+  background: transparent !important;
+}
+
+.dimension-tabs .t-tabs__item {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dimension-tabs .t-tabs__item--active {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
+  border-radius: 16rpx !important;
+}
+
+.dimension-tabs .t-tabs__track {
+  display: none !important;
+}
+
 .resting-bg .dimension-tabs {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10rpx);
+}
+
+.resting-bg .dimension-tabs .t-tabs__item {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.resting-bg .dimension-tabs .t-tabs__item--active {
+  background: rgba(0, 82, 217, 0.1) !important;
+  color: #0052d9 !important;
 }
 
 /* 燃尽模式下的维度切换 */
@@ -337,10 +370,20 @@
   backdrop-filter: blur(20rpx);
 }
 
+.burnout-mode .dimension-tabs .t-tabs__item--active {
+  background: rgba(220, 38, 38, 0.4) !important;
+  color: white !important;
+}
+
 /* 摸鱼模式下的维度切换 */
 .slack-mode .dimension-tabs {
   background: rgba(16, 185, 129, 0.2);
   backdrop-filter: blur(20rpx);
+}
+
+.slack-mode .dimension-tabs .t-tabs__item--active {
+  background: rgba(16, 185, 129, 0.4) !important;
+  color: white !important;
 }
 
 /* 进度卡片 */
