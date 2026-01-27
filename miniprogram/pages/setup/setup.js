@@ -1,3 +1,5 @@
+const { StorageManager } = require('../../utils/storage-manager.js');
+
 Page({
   data: {
     step: 1,
@@ -105,7 +107,45 @@ Page({
 
     this.setData({
       'formData.segments': segments
+    }, () => {
+      // 时间变更后重新计算休息间隙
+      this.updateRestSegments();
     });
+  },
+
+  // 更新休息间隙显示
+  updateRestSegments() {
+    const segments = this.data.formData.segments;
+
+    // 按开始时间排序
+    const sortedSegments = [...segments].sort((a, b) => {
+      const aStart = this.timeToMinutes(a.startTime);
+      const bStart = this.timeToMinutes(b.startTime);
+      return aStart - bStart;
+    });
+
+    // 检查是否有间隙
+    let hasGap = false;
+    for (let i = 0; i < sortedSegments.length - 1; i++) {
+      const currentEnd = this.timeToMinutes(sortedSegments[i].endTime);
+      const nextStart = this.timeToMinutes(sortedSegments[i + 1].startTime);
+
+      // 如果间隙大于0分钟，说明有休息时间
+      if (nextStart > currentEnd) {
+        hasGap = true;
+        break;
+      }
+    }
+
+    this.setData({
+      hasRestSegment: hasGap
+    });
+  },
+
+  // 时间字符串转分钟数
+  timeToMinutes(timeStr) {
+    const [hour, minute] = timeStr.split(':').map(Number);
+    return hour * 60 + minute;
   },
 
   // 添加时段
@@ -121,6 +161,9 @@ Page({
     this.setData({
       'formData.segments': [...this.data.formData.segments, newSegment],
       nextSegmentId: this.data.nextSegmentId + 1
+    }, () => {
+      // 添加后重新计算休息间隙
+      this.updateRestSegments();
     });
   },
 
@@ -139,6 +182,9 @@ Page({
 
     this.setData({
       'formData.segments': segments
+    }, () => {
+      // 删除后重新计算休息间隙
+      this.updateRestSegments();
     });
   },
 
@@ -199,20 +245,28 @@ Page({
       return;
     }
 
-    // 保存设置到本地存储
-    wx.setStorageSync('userConfig', this.data.formData);
-    wx.setStorageSync('hasSetup', true);
+    // 使用存储管理器保存配置
+    const success = StorageManager.saveUserConfig(this.data.formData);
 
-    wx.showToast({
-      title: '设置完成',
-      icon: 'success'
-    });
+    if (success) {
+      wx.setStorageSync('hasSetup', true);
 
-    // 跳转到首页
-    setTimeout(() => {
-      wx.switchTab({
-        url: '/pages/home/home'
+      wx.showToast({
+        title: '设置完成',
+        icon: 'success'
       });
-    }, 1500);
+
+      // 跳转到首页
+      setTimeout(() => {
+        wx.switchTab({
+          url: '/pages/home/home'
+        });
+      }, 1500);
+    } else {
+      wx.showToast({
+        title: '保存失败，请重试',
+        icon: 'none'
+      });
+    }
   }
 });
