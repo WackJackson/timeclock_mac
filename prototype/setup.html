@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>引导设置</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'td-brand': '#0052d9',
+                        'td-brand-light': '#ecf2fe',
+                        'td-success': '#00a870',
+                        'td-warning': '#ed7b2f',
+                        'td-error': '#e34d59',
+                        'td-text': '#242424',
+                        'td-text-secondary': '#666666',
+                        'td-bg': '#f5f5f5',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        
+        .checkbox-item input:checked + span {
+            background: #0052d9;
+            border-color: #0052d9;
+            color: white;
+        }
+        
+        .time-segment {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%);
+        }
+        
+        .rest-segment {
+            background: linear-gradient(135deg, #f0fff4 0%, #e8fdf0 100%);
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+    <!-- 状态栏占位 -->
+    <div class="h-12 bg-white"></div>
+    
+    <!-- 头部 -->
+    <div class="px-6 pt-4 pb-6">
+        <h1 class="text-2xl font-bold text-td-text">欢迎使用</h1>
+        <p class="text-td-text-secondary mt-1">完成设置后开启你的时薪观察之旅</p>
+    </div>
+    
+    <!-- 进度指示器 -->
+    <div class="px-6 mb-6">
+        <div class="flex items-center gap-2">
+            <div class="flex-1 h-1 bg-td-brand rounded-full"></div>
+            <div class="flex-1 h-1 bg-td-brand rounded-full"></div>
+            <div class="flex-1 h-1 bg-gray-200 rounded-full"></div>
+        </div>
+        <p class="text-sm text-td-text-secondary mt-2">步骤 2/3</p>
+    </div>
+    
+    <!-- 表单内容 -->
+    <div class="px-6 space-y-6 overflow-y-auto" style="max-height: 580px;">
+        <!-- 月薪设置 -->
+        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <label class="block text-sm font-medium text-td-text mb-3">
+                <span class="flex items-center gap-2">
+                    <span class="w-6 h-6 bg-td-brand-light rounded-full flex items-center justify-center">
+                        💰
+                    </span>
+                    月薪设置
+                </span>
+            </label>
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-td-text-secondary text-lg">¥</span>
+                <input 
+                    type="number" 
+                    value="15000"
+                    class="w-full h-14 pl-10 pr-4 text-2xl font-bold text-td-text bg-td-bg rounded-xl border-2 border-transparent focus:border-td-brand focus:outline-none transition-colors"
+                    placeholder="输入月薪"
+                >
+            </div>
+            <p class="text-xs text-td-text-secondary mt-2">建议填写税后实际到手金额</p>
+        </div>
+        
+        <!-- 工作日设定 -->
+        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <label class="block text-sm font-medium text-td-text mb-3">
+                <span class="flex items-center gap-2">
+                    <span class="w-6 h-6 bg-td-brand-light rounded-full flex items-center justify-center">
+                        📅
+                    </span>
+                    工作日设定
+                </span>
+            </label>
+            <div class="grid grid-cols-7 gap-2">
+                <label class="checkbox-item cursor-pointer">
+                    <input type="checkbox" checked class="hidden">
+                    <span class="block text-center py-2 px-1 text-sm font-medium rounded-lg border-2 border-gray-200 transition-all">一</span>
+                </label>
+                <label class="checkbox-item cursor-pointer">
+                    <input type="checkbox" checked class="hidden">
+                    <span class="block text-center py-2 px-1 text-sm font-medium rounded-lg border-2 border-gray-200 transition-all">二</span>
+                </label>
+                <label class="checkbox-item cursor-pointer">
+                    <input type="checkbox" checked class="hidden">
+                    <span class="block text-center py-2 px-1 text-sm font-medium rounded-lg border-2 border-gray-200 transition-all">三</span>
+                </label>
+                <label class="checkbox-item cursor-pointer">
+                    <input type="checkbox" checked class="hidden">
+                    <span class="block text-center py-2 px-1 text-sm font-medium rounded-lg border-2 border-gray-200 transition-all">四</span>
+                </label>
+                <label class="checkbox-item cursor-pointer">
+                    <input type="checkbox" checked class="hidden">
+                    <span class="block text-center py-2 px-1 text-sm font-medium rounded-lg border-2 border-gray-200 transition-all">五</span>
+                </label>
+                <label class="checkbox-item cursor-pointer">
+                    <input type="checkbox" class="hidden">
+                    <span class="block text-center py-2 px-1 text-sm font-medium rounded-lg border-2 border-gray-200 transition-all">六</span>
+                </label>
+                <label class="checkbox-item cursor-pointer">
+                    <input type="checkbox" class="hidden">
+                    <span class="block text-center py-2 px-1 text-sm font-medium rounded-lg border-2 border-gray-200 transition-all">日</span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- 时段规划 -->
+        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <label class="block text-sm font-medium text-td-text mb-3">
+                <span class="flex items-center gap-2">
+                    <span class="w-6 h-6 bg-td-brand-light rounded-full flex items-center justify-center">
+                        ⏰
+                    </span>
+                    时段规划
+                </span>
+            </label>
+            
+            <!-- 时段列表 -->
+            <div class="space-y-3">
+                <!-- 上午工作时段 -->
+                <div class="time-segment rounded-xl p-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-medium text-td-brand bg-white px-2 py-1 rounded-full">工作</span>
+                        <button class="text-td-text-secondary hover:text-td-error">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <input type="text" value="上午搬砖" class="w-full text-sm font-medium text-td-text bg-transparent border-none focus:outline-none mb-2" placeholder="时段名称">
+                    <div class="flex items-center gap-2 text-sm text-td-text-secondary">
+                        <input type="time" value="09:00" class="bg-white rounded-lg px-3 py-2 border border-gray-200 focus:border-td-brand focus:outline-none">
+                        <span>至</span>
+                        <input type="time" value="12:00" class="bg-white rounded-lg px-3 py-2 border border-gray-200 focus:border-td-brand focus:outline-none">
+                    </div>
+                </div>
+                
+                <!-- 自动生成的休息间隙 -->
+                <div class="rest-segment rounded-xl p-3 border-2 border-dashed border-green-200">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xs font-medium text-td-success bg-white px-2 py-1 rounded-full">休息</span>
+                        <span class="text-xs text-td-text-secondary">自动生成</span>
+                    </div>
+                    <p class="text-sm text-td-text-secondary">12:00 - 14:00 · 午休时间</p>
+                </div>
+                
+                <!-- 下午工作时段 -->
+                <div class="time-segment rounded-xl p-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-medium text-td-brand bg-white px-2 py-1 rounded-full">工作</span>
+                        <button class="text-td-text-secondary hover:text-td-error">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <input type="text" value="下午搬砖" class="w-full text-sm font-medium text-td-text bg-transparent border-none focus:outline-none mb-2" placeholder="时段名称">
+                    <div class="flex items-center gap-2 text-sm text-td-text-secondary">
+                        <input type="time" value="14:00" class="bg-white rounded-lg px-3 py-2 border border-gray-200 focus:border-td-brand focus:outline-none">
+                        <span>至</span>
+                        <input type="time" value="18:00" class="bg-white rounded-lg px-3 py-2 border border-gray-200 focus:border-td-brand focus:outline-none">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 添加时段按钮 -->
+            <button class="w-full mt-4 py-3 border-2 border-dashed border-gray-200 rounded-xl text-td-text-secondary hover:border-td-brand hover:text-td-brand transition-colors flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                添加工作时段
+            </button>
+        </div>
+    </div>
+    
+    <!-- 底部按钮 -->
+    <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white">
+        <button class="w-full h-12 bg-td-brand text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 active:scale-95 transition-transform">
+            完成设置
+        </button>
+    </div>
+</body>
+</html>

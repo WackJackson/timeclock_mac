@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>愿望详情</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'td-brand': '#0052d9',
+                        'td-brand-light': '#ecf2fe',
+                        'td-success': '#00a870',
+                        'td-warning': '#ed7b2f',
+                        'td-error': '#e34d59',
+                        'td-text': '#242424',
+                        'td-text-secondary': '#666666',
+                        'td-bg': '#f5f5f5',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        
+        .header-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .mode-tag-normal { background: #e8f4fd; color: #0052d9; }
+        .mode-tag-burnout { background: #fff0e6; color: #ed7b2f; }
+        .mode-tag-slack { background: #e0f7f1; color: #00a870; }
+    </style>
+</head>
+<body class="bg-td-bg min-h-screen">
+    <!-- 头部背景 -->
+    <div class="header-bg pt-12 pb-24 px-6 relative">
+        <!-- 返回按钮 -->
+        <button class="absolute top-14 left-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
+        
+        <!-- 更多操作 -->
+        <button class="absolute top-14 right-4 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+            </svg>
+        </button>
+        
+        <!-- 愿望信息 -->
+        <div class="text-center text-white pt-4">
+            <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl mx-auto mb-4 flex items-center justify-center text-4xl shadow-xl">
+                🎧
+            </div>
+            <h1 class="text-xl font-bold">AirPods Pro 2</h1>
+            <p class="text-sm opacity-80 mt-1">降噪耳机，专注工作必备</p>
+        </div>
+    </div>
+    
+    <!-- 进度卡片 -->
+    <div class="px-6 -mt-16 relative z-10">
+        <div class="bg-white rounded-2xl p-6 shadow-lg">
+            <div class="text-center mb-4">
+                <p class="text-sm text-td-text-secondary">当前进度</p>
+                <div class="mt-2">
+                    <span class="text-3xl font-bold text-td-brand">¥1,245.50</span>
+                    <span class="text-td-text-secondary"> / ¥1,899.00</span>
+                </div>
+            </div>
+            
+            <!-- 圆形进度 -->
+            <div class="relative w-32 h-32 mx-auto my-4">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#f0f0f0" stroke-width="8"/>
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gradient)" stroke-width="8" stroke-linecap="round"
+                        stroke-dasharray="282.7" stroke-dashoffset="97"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#0052d9"/>
+                            <stop offset="100%" stop-color="#667eea"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="text-2xl font-bold text-td-brand">65.6%</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-between text-sm mt-4">
+                <div class="text-center">
+                    <p class="text-td-text-secondary">已攒天数</p>
+                    <p class="font-bold text-td-text mt-1">8 天</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-td-text-secondary">预计完成</p>
+                    <p class="font-bold text-td-text mt-1">4 天后</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-td-text-secondary">日均速度</p>
+                    <p class="font-bold text-td-text mt-1">¥155.69</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 资金来源 -->
+    <div class="px-6 mt-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold text-td-text">资金来源</h2>
+            <button class="text-sm text-td-brand">查看全部</button>
+        </div>
+        
+        <div class="bg-white rounded-2xl overflow-hidden">
+            <!-- 记录项 -->
+            <div class="p-4 border-b border-gray-50">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-td-brand-light rounded-xl flex items-center justify-center">
+                            <span class="text-lg">⚡</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-td-text">下午搬砖</span>
+                                <span class="mode-tag-normal text-xs px-1.5 py-0.5 rounded">普通模式</span>
+                            </div>
+                            <p class="text-xs text-td-text-secondary mt-0.5">01-25 14:00 - 18:00</p>
+                        </div>
+                    </div>
+                    <span class="text-td-brand font-bold">+¥172.80</span>
+                </div>
+            </div>
+            
+            <div class="p-4 border-b border-gray-50">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center">
+                            <span class="text-lg">🔥</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-td-text">上午搬砖</span>
+                                <span class="mode-tag-burnout text-xs px-1.5 py-0.5 rounded">燃尽模式</span>
+                            </div>
+                            <p class="text-xs text-td-text-secondary mt-0.5">01-25 09:00 - 12:00</p>
+                        </div>
+                    </div>
+                    <span class="text-td-warning font-bold">+¥129.60</span>
+                </div>
+            </div>
+            
+            <div class="p-4 border-b border-gray-50">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-cyan-50 rounded-xl flex items-center justify-center">
+                            <span class="text-lg">🐟</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-td-text">下午搬砖</span>
+                                <span class="mode-tag-slack text-xs px-1.5 py-0.5 rounded">摸鱼模式</span>
+                            </div>
+                            <p class="text-xs text-td-text-secondary mt-0.5">01-24 14:00 - 18:00</p>
+                        </div>
+                    </div>
+                    <span class="text-td-success font-bold">+¥172.80</span>
+                </div>
+            </div>
+            
+            <div class="p-4 border-b border-gray-50">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-td-brand-light rounded-xl flex items-center justify-center">
+                            <span class="text-lg">⚡</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-td-text">上午搬砖</span>
+                                <span class="mode-tag-normal text-xs px-1.5 py-0.5 rounded">普通模式</span>
+                            </div>
+                            <p class="text-xs text-td-text-secondary mt-0.5">01-24 09:00 - 12:00</p>
+                        </div>
+                    </div>
+                    <span class="text-td-brand font-bold">+¥129.60</span>
+                </div>
+            </div>
+            
+            <div class="p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-td-brand-light rounded-xl flex items-center justify-center">
+                            <span class="text-lg">⚡</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-td-text">下午搬砖</span>
+                                <span class="mode-tag-normal text-xs px-1.5 py-0.5 rounded">普通模式</span>
+                            </div>
+                            <p class="text-xs text-td-text-secondary mt-0.5">01-23 14:00 - 18:00</p>
+                        </div>
+                    </div>
+                    <span class="text-td-brand font-bold">+¥172.80</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部操作 -->
+    <div class="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-td-bg via-td-bg pb-10">
+        <button class="w-full h-12 bg-td-brand text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 active:scale-95 transition-transform">
+            设为进行中
+        </button>
+    </div>
+</body>
+</html>

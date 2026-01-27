@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>攒钱观察</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'td-brand': '#0052d9',
+                        'td-brand-light': '#ecf2fe',
+                        'td-success': '#00a870',
+                        'td-warning': '#ed7b2f',
+                        'td-error': '#e34d59',
+                        'td-text': '#242424',
+                        'td-text-secondary': '#666666',
+                        'td-bg': '#f5f5f5',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        
+        .wish-card {
+            transition: all 0.3s ease;
+        }
+        
+        .wish-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .wish-card.active {
+            border: 2px solid #0052d9;
+            box-shadow: 0 10px 25px -5px rgba(0, 82, 217, 0.2);
+        }
+        
+        .progress-glow {
+            box-shadow: 0 0 20px rgba(0, 82, 217, 0.3);
+        }
+        
+        .float-btn {
+            box-shadow: 0 10px 25px -5px rgba(0, 82, 217, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-td-bg min-h-screen">
+    <!-- 状态栏占位 -->
+    <div class="h-12 bg-white"></div>
+    
+    <!-- 头部 -->
+    <div class="bg-white px-6 pt-4 pb-6 shadow-sm">
+        <h1 class="text-2xl font-bold text-td-text">攒钱观察</h1>
+        <p class="text-td-text-secondary text-sm mt-1">把薪水变成看得见的梦想</p>
+        
+        <!-- 汇总信息 -->
+        <div class="mt-4 flex items-center gap-4">
+            <div class="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-4 text-white">
+                <p class="text-xs opacity-80">总攒钱进度</p>
+                <p class="text-2xl font-bold mt-1">¥2,845.50</p>
+                <div class="flex items-center gap-2 mt-2">
+                    <div class="flex-1 h-1.5 bg-white/30 rounded-full overflow-hidden">
+                        <div class="h-full bg-white rounded-full" style="width: 35%"></div>
+                    </div>
+                    <span class="text-xs">35%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 愿望列表 -->
+    <div class="px-6 py-4 space-y-4 pb-32" style="max-height: calc(100vh - 280px); overflow-y: auto;">
+        <!-- 进行中的愿望 -->
+        <div class="wish-card active bg-white rounded-2xl p-4 border-2 border-td-brand">
+            <div class="flex items-start gap-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center text-3xl shadow-lg">
+                    🎧
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2 py-0.5 bg-td-brand text-white text-xs font-medium rounded-full">进行中</span>
+                        <span class="text-xs text-td-text-secondary">正在攒钱</span>
+                    </div>
+                    <h3 class="font-bold text-td-text">AirPods Pro 2</h3>
+                    <p class="text-sm text-td-text-secondary mt-1">
+                        <span class="text-td-brand font-bold">¥1,245.50</span>
+                        <span class="mx-1">/</span>
+                        <span>¥1,899.00</span>
+                    </p>
+                    
+                    <!-- 进度条 -->
+                    <div class="mt-3">
+                        <div class="h-2.5 bg-td-bg rounded-full overflow-hidden progress-glow">
+                            <div class="h-full bg-gradient-to-r from-td-brand to-blue-400 rounded-full transition-all duration-500" style="width: 65.6%"></div>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-xs text-td-text-secondary">65.6%</span>
+                            <span class="text-xs text-td-success">还差 ¥653.50</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 其他愿望 -->
+        <div class="wish-card bg-white rounded-2xl p-4 border-2 border-transparent">
+            <div class="flex items-start gap-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg">
+                    🎮
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2 py-0.5 bg-gray-100 text-td-text-secondary text-xs font-medium rounded-full">等待中</span>
+                    </div>
+                    <h3 class="font-bold text-td-text">Nintendo Switch</h3>
+                    <p class="text-sm text-td-text-secondary mt-1">
+                        <span class="text-td-text font-bold">¥800.00</span>
+                        <span class="mx-1">/</span>
+                        <span>¥2,099.00</span>
+                    </p>
+                    
+                    <!-- 进度条 -->
+                    <div class="mt-3">
+                        <div class="h-2 bg-td-bg rounded-full overflow-hidden">
+                            <div class="h-full bg-gray-300 rounded-full" style="width: 38.1%"></div>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-xs text-td-text-secondary">38.1%</span>
+                            <span class="text-xs text-td-text-secondary">还差 ¥1,299.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 已完成愿望 -->
+        <div class="wish-card bg-white rounded-2xl p-4 border-2 border-transparent opacity-80">
+            <div class="flex items-start gap-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-500 rounded-2xl flex items-center justify-center text-3xl shadow-lg relative">
+                    👟
+                    <div class="absolute -top-2 -right-2 w-6 h-6 bg-td-success rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2 py-0.5 bg-td-success/10 text-td-success text-xs font-medium rounded-full">已完成</span>
+                        <span class="text-xs text-td-text-secondary">2026-01-15</span>
+                    </div>
+                    <h3 class="font-bold text-td-text">Nike Air Max</h3>
+                    <p class="text-sm text-td-text-secondary mt-1">
+                        <span class="text-td-success font-bold">¥800.00</span>
+                        <span class="mx-1">/</span>
+                        <span>¥800.00</span>
+                    </p>
+                    
+                    <!-- 进度条 -->
+                    <div class="mt-3">
+                        <div class="h-2 bg-td-bg rounded-full overflow-hidden">
+                            <div class="h-full bg-td-success rounded-full" style="width: 100%"></div>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-xs text-td-success">100% 完成!</span>
+                            <span class="text-xs text-td-text-secondary">用时 12 天</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新愿望卡片 -->
+        <div class="wish-card bg-white rounded-2xl p-4 border-2 border-dashed border-gray-200">
+            <div class="flex items-start gap-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg">
+                    ✈️
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2 py-0.5 bg-gray-100 text-td-text-secondary text-xs font-medium rounded-full">等待中</span>
+                    </div>
+                    <h3 class="font-bold text-td-text">日本旅行基金</h3>
+                    <p class="text-sm text-td-text-secondary mt-1">
+                        <span class="text-td-text font-bold">¥0.00</span>
+                        <span class="mx-1">/</span>
+                        <span>¥8,000.00</span>
+                    </p>
+                    
+                    <div class="mt-3">
+                        <div class="h-2 bg-td-bg rounded-full overflow-hidden">
+                            <div class="h-full bg-gray-300 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-xs text-td-text-secondary">0%</span>
+                            <span class="text-xs text-td-text-secondary">还差 ¥8,000.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 新建愿望按钮 -->
+    <div class="fixed bottom-24 right-6">
+        <button class="float-btn w-14 h-14 bg-td-brand rounded-full flex items-center justify-center text-white active:scale-95 transition-transform">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- 底部导航 -->
+    <div class="fixed bottom-0 left-0 right-0">
+        <div class="bg-white border-t border-gray-100">
+            <div class="flex">
+                <button class="flex-1 py-4 flex flex-col items-center gap-1 text-gray-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                    </svg>
+                    <span class="text-xs">时薪</span>
+                </button>
+                <button class="flex-1 py-4 flex flex-col items-center gap-1 text-td-brand">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-xs font-medium">攒钱</span>
+                </button>
+                <button class="flex-1 py-4 flex flex-col items-center gap-1 text-gray-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <span class="text-xs">我的</span>
+                </button>
+            </div>
+        </div>
+        <!-- Home Indicator -->
+        <div class="h-8 bg-white flex items-center justify-center">
+            <div class="w-32 h-1 bg-gray-200 rounded-full"></div>
+        </div>
+    </div>
+</body>
+</html>
