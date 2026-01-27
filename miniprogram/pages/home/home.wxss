@@ -319,69 +319,58 @@
 /* 维度切换 */
 .dimension-tabs {
   margin-bottom: 32rpx;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20rpx);
   border-radius: 24rpx;
-  padding: 8rpx;
   overflow: hidden;
 }
 
-/* 覆盖TDesign tabs组件的默认样式 */
-.dimension-tabs .t-tabs {
+/* 使用外部样式类定制TDesign tabs */
+.custom-tabs {
   background: transparent !important;
 }
 
-.dimension-tabs .t-tabs__nav {
+.custom-tabs-nav {
   background: transparent !important;
+  padding: 8rpx !important;
 }
 
-.dimension-tabs .t-tabs__item {
-  background: transparent !important;
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-.dimension-tabs .t-tabs__item--active {
-  background: rgba(255, 255, 255, 0.25) !important;
+.custom-tabs-item {
+  background: rgba(255, 255, 255, 0.1) !important;
   color: white !important;
   border-radius: 16rpx !important;
+  margin: 0 4rpx !important;
+  opacity: 0.6 !important;
+  transition: all 0.3s ease !important;
 }
 
-.dimension-tabs .t-tabs__track {
+.custom-tabs-active {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
+  opacity: 1 !important;
+}
+
+.custom-tabs-track {
   display: none !important;
 }
 
-.resting-bg .dimension-tabs {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10rpx);
+/* 休息状态 */
+.resting-bg .custom-tabs-item {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #666 !important;
 }
 
-.resting-bg .dimension-tabs .t-tabs__item {
-  color: rgba(0, 0, 0, 0.6) !important;
-}
-
-.resting-bg .dimension-tabs .t-tabs__item--active {
+.resting-bg .custom-tabs-active {
   background: rgba(0, 82, 217, 0.1) !important;
   color: #0052d9 !important;
 }
 
-/* 燃尽模式下的维度切换 */
-.burnout-mode .dimension-tabs {
-  background: rgba(220, 38, 38, 0.2);
-  backdrop-filter: blur(20rpx);
-}
-
-.burnout-mode .dimension-tabs .t-tabs__item--active {
+/* 燃尽模式 */
+.burnout-mode .custom-tabs-active {
   background: rgba(220, 38, 38, 0.4) !important;
   color: white !important;
 }
 
-/* 摸鱼模式下的维度切换 */
-.slack-mode .dimension-tabs {
-  background: rgba(16, 185, 129, 0.2);
-  backdrop-filter: blur(20rpx);
-}
-
-.slack-mode .dimension-tabs .t-tabs__item--active {
+/* 摸鱼模式 */
+.slack-mode .custom-tabs-active {
   background: rgba(16, 185, 129, 0.4) !important;
   color: white !important;
 }
