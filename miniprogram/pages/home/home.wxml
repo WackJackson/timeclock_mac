@@ -1,4 +1,4 @@
-<view class="home-container {{isWorking ? 'working-bg' : 'resting-bg'}}">
+<view class="home-container {{isWorking ? 'working-bg' : 'resting-bg'}} {{isWorking && currentMode === 'burnout' ? 'burnout-mode' : ''}} {{isWorking && currentMode === 'slack' ? 'slack-mode' : ''}}">
   <!-- 顶部状态指示 -->
   <view class="status-bar">
     <view class="flex" style="align-items: center; gap: 16rpx;">
@@ -14,6 +14,21 @@
   <view class="clouds" wx:if="{{!isWorking}}">
     <view class="cloud cloud-1"></view>
     <view class="cloud cloud-2"></view>
+  </view>
+
+  <!-- 摸鱼模式装饰 - 气泡 -->
+  <view class="bubbles" wx:if="{{isWorking && currentMode === 'slack'}}">
+    <view class="bubble bubble-1"></view>
+    <view class="bubble bubble-2"></view>
+    <view class="bubble bubble-3"></view>
+    <view class="bubble bubble-4"></view>
+  </view>
+
+  <!-- 燃尽模式装饰 - 火焰粒子 -->
+  <view class="flames" wx:if="{{isWorking && currentMode === 'burnout'}}">
+    <view class="flame flame-1"></view>
+    <view class="flame flame-2"></view>
+    <view class="flame flame-3"></view>
   </view>
 
   <!-- 核心金额展示 -->

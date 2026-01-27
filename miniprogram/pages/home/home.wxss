@@ -7,9 +7,21 @@
   transition: all 0.3s ease;
 }
 
-/* 背景渐变 */
+/* 背景渐变 - 根据模式切换 */
 .working-bg {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f64f59 100%);
+  color: white;
+}
+
+/* 燃尽模式背景 */
+.working-bg.burnout-mode {
+  background: linear-gradient(135deg, #1a1a1a 0%, #dc2626 50%, #7f1d1d 100%);
+  color: white;
+}
+
+/* 摸鱼模式背景 */
+.working-bg.slack-mode {
+  background: linear-gradient(135deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%);
   color: white;
 }
 
@@ -109,6 +121,120 @@
   50% { transform: translateY(-20rpx) translateX(20rpx); }
 }
 
+/* 气泡装饰 - 摸鱼模式 */
+.bubbles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bubble {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  animation: bubble-rise 4s ease-in infinite;
+}
+
+.bubble-1 {
+  width: 60rpx;
+  height: 60rpx;
+  left: 20%;
+  bottom: -60rpx;
+  animation-delay: 0s;
+}
+
+.bubble-2 {
+  width: 40rpx;
+  height: 40rpx;
+  left: 50%;
+  bottom: -40rpx;
+  animation-delay: 1s;
+}
+
+.bubble-3 {
+  width: 80rpx;
+  height: 80rpx;
+  left: 70%;
+  bottom: -80rpx;
+  animation-delay: 2s;
+}
+
+.bubble-4 {
+  width: 50rpx;
+  height: 50rpx;
+  left: 35%;
+  bottom: -50rpx;
+  animation-delay: 3s;
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-1000rpx) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* 火焰装饰 - 燃尽模式 */
+.flames {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.flame {
+  position: absolute;
+  width: 40rpx;
+  height: 80rpx;
+  background: linear-gradient(to top, #dc2626, #f97316, transparent);
+  border-radius: 50% 50% 0 0;
+  animation: flame-flicker 1s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+.flame-1 {
+  left: 10%;
+  bottom: 200rpx;
+  animation-delay: 0s;
+}
+
+.flame-2 {
+  right: 15%;
+  bottom: 300rpx;
+  animation-delay: 0.3s;
+}
+
+.flame-3 {
+  left: 50%;
+  bottom: 150rpx;
+  animation-delay: 0.6s;
+}
+
+@keyframes flame-flicker {
+  0%, 100% {
+    transform: scaleY(1) translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scaleY(1.3) translateY(-20rpx);
+    opacity: 0.9;
+  }
+}
+
 /* 金额展示区 */
 .money-display {
   text-align: center;
@@ -193,6 +319,28 @@
 /* 维度切换 */
 .dimension-tabs {
   margin-bottom: 32rpx;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20rpx);
+  border-radius: 24rpx;
+  padding: 8rpx;
+  overflow: hidden;
+}
+
+.resting-bg .dimension-tabs {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10rpx);
+}
+
+/* 燃尽模式下的维度切换 */
+.burnout-mode .dimension-tabs {
+  background: rgba(220, 38, 38, 0.2);
+  backdrop-filter: blur(20rpx);
+}
+
+/* 摸鱼模式下的维度切换 */
+.slack-mode .dimension-tabs {
+  background: rgba(16, 185, 129, 0.2);
+  backdrop-filter: blur(20rpx);
 }
 
 /* 进度卡片 */
@@ -207,6 +355,20 @@
 .resting-bg .progress-card {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10rpx);
+}
+
+/* 燃尽模式下的进度卡片 */
+.burnout-mode .progress-card {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20rpx);
+  border: 2rpx solid rgba(220, 38, 38, 0.3);
+}
+
+/* 摸鱼模式下的进度卡片 */
+.slack-mode .progress-card {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20rpx);
+  border: 2rpx solid rgba(16, 185, 129, 0.3);
 }
 
 .card-label {
@@ -239,6 +401,18 @@
 
 .resting-bg .progress-bar-fill {
   background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
+}
+
+/* 燃尽模式进度条 */
+.burnout-mode .progress-bar-fill {
+  background: linear-gradient(90deg, #dc2626 0%, #f97316 100%);
+  box-shadow: 0 0 20rpx rgba(220, 38, 38, 0.6);
+}
+
+/* 摸鱼模式进度条 */
+.slack-mode .progress-bar-fill {
+  background: linear-gradient(90deg, #10b981 0%, #06b6d4 100%);
+  box-shadow: 0 0 20rpx rgba(16, 185, 129, 0.4);
 }
 
 /* 模式选择 */
@@ -278,6 +452,20 @@
   opacity: 1;
   transform: scale(1.05);
   box-shadow: 0 20rpx 50rpx -10rpx rgba(0, 0, 0, 0.3);
+}
+
+/* 燃尽模式激活样式 */
+.burnout-mode .mode-btn.active {
+  background: rgba(220, 38, 38, 0.3);
+  border-color: rgba(220, 38, 38, 0.6);
+  box-shadow: 0 20rpx 50rpx -10rpx rgba(220, 38, 38, 0.5);
+}
+
+/* 摸鱼模式激活样式 */
+.slack-mode .mode-btn.active {
+  background: rgba(16, 185, 129, 0.3);
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 20rpx 50rpx -10rpx rgba(16, 185, 129, 0.5);
 }
 
 .mode-icon {
