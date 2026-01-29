@@ -212,11 +212,18 @@ class StorageManager {
    */
   static saveTodayEarnings(earnings) {
     try {
+      const todayKey = this.getTodayKey();
       const data = {
-        date: this.getTodayKey(),
+        date: todayKey,
         ...earnings
       };
       wx.setStorageSync(STORAGE_KEYS.TODAY_EARNINGS, data);
+
+      // 同时保存到历史记录
+      const history = wx.getStorageSync(STORAGE_KEYS.TODAY_EARNINGS + '_history') || {};
+      history[todayKey] = earnings;
+      wx.setStorageSync(STORAGE_KEYS.TODAY_EARNINGS + '_history', history);
+
       return true;
     } catch (e) {
       console.error('保存今日收入失败:', e);
@@ -263,6 +270,99 @@ class StorageManager {
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * 获取本周收入
+   */
+  static getWeekEarnings() {
+    try {
+      const allEarnings = wx.getStorageSync(STORAGE_KEYS.TODAY_EARNINGS + '_history') || {};
+      const now = new Date();
+      const today = now.getDay(); // 0-6, 0是周日
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - (today === 0 ? 6 : today - 1)); // 调整到本周一
+
+      let total = 0;
+      let normal = 0;
+      let burnout = 0;
+      let slack = 0;
+
+      // 遍历本周每一天
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        if (date > now) break; // 不计算未来的日期
+
+        const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const dayData = allEarnings[dateKey];
+
+        if (dayData) {
+          total += dayData.total || 0;
+          normal += dayData.normal || 0;
+          burnout += dayData.burnout || 0;
+          slack += dayData.slack || 0;
+        }
+      }
+
+      // 加上今天的数据
+      const todayData = this.getTodayEarnings();
+      total += todayData.total || 0;
+      normal += todayData.normal || 0;
+      burnout += todayData.burnout || 0;
+      slack += todayData.slack || 0;
+
+      return { total, normal, burnout, slack };
+    } catch (e) {
+      console.error('获取本周收入失败:', e);
+      return { total: 0, normal: 0, burnout: 0, slack: 0 };
+    }
+  }
+
+  /**
+   * 获取本月收入
+   */
+  static getMonthEarnings() {
+    try {
+      const allEarnings = wx.getStorageSync(STORAGE_KEYS.TODAY_EARNINGS + '_history') || {};
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+
+      let total = 0;
+      let normal = 0;
+      let burnout = 0;
+      let slack = 0;
+
+      // 遍历本月每一天
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        if (date > now) break; // 不计算未来的日期
+
+        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayData = allEarnings[dateKey];
+
+        if (dayData) {
+          total += dayData.total || 0;
+          normal += dayData.normal || 0;
+          burnout += dayData.burnout || 0;
+          slack += dayData.slack || 0;
+        }
+      }
+
+      // 加上今天的数据
+      const todayData = this.getTodayEarnings();
+      total += todayData.total || 0;
+      normal += todayData.normal || 0;
+      burnout += todayData.burnout || 0;
+      slack += todayData.slack || 0;
+
+      return { total, normal, burnout, slack };
+    } catch (e) {
+      console.error('获取本月收入失败:', e);
+      return { total: 0, normal: 0, burnout: 0, slack: 0 };
+    }
   }
 
   /**

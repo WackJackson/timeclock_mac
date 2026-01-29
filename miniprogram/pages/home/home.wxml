@@ -1,4 +1,9 @@
 <view class="home-container {{isWorking ? 'working-bg' : 'resting-bg'}} {{isWorking && currentMode === 'burnout' ? 'burnout-mode' : ''}} {{isWorking && currentMode === 'slack' ? 'slack-mode' : ''}}">
+  <!-- 自定义顶部标题 -->
+  <view class="custom-nav-bar">
+    <text class="nav-title">时薪观察</text>
+  </view>
+
   <!-- 顶部状态指示 -->
   <view class="status-bar">
     <view class="flex" style="align-items: center; gap: 16rpx;">
@@ -34,7 +39,7 @@
   <!-- 核心金额展示 -->
   <view class="money-display">
     <view class="float-icon" wx:if="{{!isWorking}}">🌸</view>
-    <text class="display-label">{{!isWorking ? '今日已赚' : '今日已赚'}}</text>
+    <text class="display-label">{{dimensionTab === 'day' ? '今日已赚' : dimensionTab === 'week' ? '本周已赚' : '本月已赚'}}</text>
     <view class="money-amount {{isWorking ? 'money-pulse' : ''}}">
       <text class="amount-main">¥{{todayEarned.integer}}</text>
       <text class="amount-decimal">.{{todayEarned.decimal}}</text>
@@ -47,49 +52,59 @@
   <view class="time-stats" wx:if="{{!isWorking}}">
     <view class="stat-item">
       <view class="stat-dot" style="background: #0052d9;"></view>
-      <text>普通 {{stats.normal}}h</text>
+      <text>普通 {{statsHours.normal}}h</text>
     </view>
     <view class="stat-item">
       <view class="stat-dot" style="background: #ed7b2f;"></view>
-      <text>燃尽 {{stats.burnout}}h</text>
+      <text>燃尽 {{statsHours.burnout}}h</text>
     </view>
     <view class="stat-item">
       <view class="stat-dot" style="background: #00a870;"></view>
-      <text>摸鱼 {{stats.slack}}h</text>
+      <text>摸鱼 {{statsHours.slack}}h</text>
     </view>
   </view>
 
   <!-- 数据维度切换 -->
-  <view class="dimension-tabs">
-    <t-tabs
-      value="{{dimensionTab}}"
-      bind:change="onDimensionChange"
-      theme="tag"
-      t-class="custom-tabs"
-      t-class-nav="custom-tabs-nav"
-      t-class-item="custom-tabs-item"
-      t-class-active="custom-tabs-active"
-      t-class-track="custom-tabs-track"
-    >
-      <t-tab-panel label="日" value="day" />
-      <t-tab-panel label="周" value="week" />
-      <t-tab-panel label="月" value="month" />
-    </t-tabs>
+  <view class="dimension-section">
+    <text class="section-label">数据维度</text>
+    <view class="dimension-buttons">
+      <view
+        class="dimension-btn {{dimensionTab === 'day' ? 'active' : ''}}"
+        bindtap="onDimensionChange"
+        data-value="day"
+      >
+        <text class="dimension-text">日</text>
+      </view>
+      <view
+        class="dimension-btn {{dimensionTab === 'week' ? 'active' : ''}}"
+        bindtap="onDimensionChange"
+        data-value="week"
+      >
+        <text class="dimension-text">周</text>
+      </view>
+      <view
+        class="dimension-btn {{dimensionTab === 'month' ? 'active' : ''}}"
+        bindtap="onDimensionChange"
+        data-value="month"
+      >
+        <text class="dimension-text">月</text>
+      </view>
+    </view>
   </view>
 
   <!-- 进度卡片 -->
   <view class="progress-card">
     <view class="flex-between mb-12">
-      <text class="card-label">今日进度</text>
+      <text class="card-label">{{dimensionTab === 'day' ? '今日进度' : dimensionTab === 'week' ? '本周进度' : '本月进度'}}</text>
       <text class="progress-percent">{{progress}}%</text>
     </view>
     <view class="progress-bar-bg">
       <view class="progress-bar-fill" style="width: {{progress}}%;"></view>
     </view>
     <view class="flex-between text-xs text-secondary" style="margin-top: 16rpx;">
-      <text>{{workStartTime}}</text>
-      <text class="text-success">← 当前：{{currentTime}} {{isWorking ? '工作中' : '休息中'}}</text>
-      <text>{{workEndTime}}</text>
+      <text>{{progressStartLabel}}</text>
+      <text class="current-indicator">← 当前：{{currentProgressLabel}} {{isWorking ? '工作中' : '休息中'}}</text>
+      <text>{{progressEndLabel}}</text>
     </view>
   </view>
 

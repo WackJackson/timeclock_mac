@@ -1,10 +1,26 @@
 .home-container {
   min-height: 100vh;
-  padding: 32rpx;
+  padding: 0;
   padding-bottom: 120rpx;
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
+}
+
+/* 自定义导航栏 */
+.custom-nav-bar {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: env(safe-area-inset-top);
+  background: transparent;
+}
+
+.nav-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: inherit;
 }
 
 /* 背景渐变 - 根据模式切换 */
@@ -36,6 +52,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 40rpx;
+  margin-top: 24rpx;
+  padding: 0 32rpx;
 }
 
 .status-dot {
@@ -295,7 +313,7 @@
   display: flex;
   justify-content: center;
   gap: 32rpx;
-  margin-bottom: 32rpx;
+  margin: 0 32rpx 32rpx 32rpx;
   padding: 24rpx;
   background: rgba(255, 255, 255, 0.7);
   border-radius: 32rpx;
@@ -316,63 +334,68 @@
   border-radius: 50%;
 }
 
-/* 维度切换 */
-.dimension-tabs {
-  margin-bottom: 32rpx;
+/* 数据维度切换 */
+.dimension-section {
+  margin: 0 32rpx 32rpx 32rpx;
+}
+
+.dimension-buttons {
+  display: flex;
+  gap: 24rpx;
+}
+
+.dimension-btn {
+  flex: 1;
+  padding: 16rpx 24rpx;
+  background: rgba(255, 255, 255, 0.1);
+  border: 4rpx solid transparent;
   border-radius: 24rpx;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: all 0.3s ease;
 }
 
-/* 使用外部样式类定制TDesign tabs */
-.custom-tabs {
-  background: transparent !important;
+.dimension-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 20rpx 50rpx -10rpx rgba(0, 0, 0, 0.3);
 }
 
-.custom-tabs-nav {
-  background: transparent !important;
-  padding: 8rpx !important;
+.dimension-text {
+  font-size: 28rpx;
+  font-weight: 500;
 }
 
-.custom-tabs-item {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
-  border-radius: 16rpx !important;
-  margin: 0 4rpx !important;
-  opacity: 0.6 !important;
-  transition: all 0.3s ease !important;
+/* 休息状态下的维度按钮 */
+.resting-bg .dimension-btn {
+  background: rgba(255, 255, 255, 0.5);
+  color: #666;
 }
 
-.custom-tabs-active {
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: white !important;
-  opacity: 1 !important;
+.resting-bg .dimension-btn.active {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 82, 217, 0.3);
+  color: #0052d9;
+  box-shadow: 0 20rpx 50rpx -10rpx rgba(0, 82, 217, 0.3);
 }
 
-.custom-tabs-track {
-  display: none !important;
+/* 燃尽模式下的维度按钮 */
+.burnout-mode .dimension-btn.active {
+  background: rgba(220, 38, 38, 0.3);
+  border-color: rgba(220, 38, 38, 0.6);
+  box-shadow: 0 20rpx 50rpx -10rpx rgba(220, 38, 38, 0.5);
 }
 
-/* 休息状态 */
-.resting-bg .custom-tabs-item {
-  background: rgba(0, 0, 0, 0.05) !important;
-  color: #666 !important;
-}
-
-.resting-bg .custom-tabs-active {
-  background: rgba(0, 82, 217, 0.1) !important;
-  color: #0052d9 !important;
-}
-
-/* 燃尽模式 */
-.burnout-mode .custom-tabs-active {
-  background: rgba(220, 38, 38, 0.4) !important;
-  color: white !important;
-}
-
-/* 摸鱼模式 */
-.slack-mode .custom-tabs-active {
-  background: rgba(16, 185, 129, 0.4) !important;
-  color: white !important;
+/* 摸鱼模式下的维度按钮 */
+.slack-mode .dimension-btn.active {
+  background: rgba(16, 185, 129, 0.3);
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 20rpx 50rpx -10rpx rgba(16, 185, 129, 0.5);
 }
 
 /* 进度卡片 */
@@ -381,7 +404,7 @@
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(20rpx);
   border-radius: 32rpx;
-  margin-bottom: 32rpx;
+  margin: 0 32rpx 32rpx 32rpx;
 }
 
 .resting-bg .progress-card {
@@ -447,9 +470,27 @@
   box-shadow: 0 0 20rpx rgba(16, 185, 129, 0.4);
 }
 
+/* 当前进度指示器 */
+.current-indicator {
+  font-size: 24rpx;
+  font-weight: normal;
+}
+
+/* 工作状态下的指示器 - 绿色，与战斗状态指示灯一致 */
+.working-bg .current-indicator {
+  color: #4ade80;
+  text-shadow: 0 0 8rpx rgba(74, 222, 128, 0.6);
+}
+
+/* 休息状态下的指示器 - 白色 */
+.resting-bg .current-indicator {
+  color: #fff;
+  text-shadow: 0 0 8rpx rgba(255, 255, 255, 0.5);
+}
+
 /* 模式选择 */
 .mode-section {
-  margin-bottom: 32rpx;
+  margin: 0 32rpx 32rpx 32rpx;
 }
 
 .section-label {
@@ -511,7 +552,7 @@
 
 /* 倒计时 */
 .countdown-section {
-  margin-bottom: 32rpx;
+  margin: 0 32rpx 32rpx 32rpx;
 }
 
 .countdown-grid {
@@ -548,7 +589,7 @@
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10rpx);
   border-radius: 32rpx;
-  margin-bottom: 32rpx;
+  margin: 0 32rpx 32rpx 32rpx;
 }
 
 .segment-icon {

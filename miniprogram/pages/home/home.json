@@ -1,6 +1,4 @@
 {
-  "navigationBarTitleText": "时薪观察",
-  "navigationBarBackgroundColor": "#667eea",
-  "navigationBarTextStyle": "white",
+  "navigationStyle": "custom",
   "enablePullDownRefresh": false
 }

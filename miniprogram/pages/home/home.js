@@ -27,12 +27,24 @@ Page({
       slack: 0
     },
 
+    // 今日统计（小时数）
+    statsHours: {
+      normal: '0.0',
+      burnout: '0.0',
+      slack: '0.0'
+    },
+
     // 进度数据
     dimensionTab: 'day',
     progress: 0,
     workStartTime: '--:--',
     workEndTime: '--:--',
     currentTime: '--:--',
+
+    // 不同维度的起止标签
+    progressStartLabel: '--:--',
+    progressEndLabel: '--:--',
+    currentProgressLabel: '--:--', // 当前进度指示器文本
 
     // 倒计时
     countdowns: [],
@@ -108,7 +120,7 @@ Page({
 
     this.setData({
       config,
-      secondSalary: salaryData.secondSalary,
+      secondSalary: salaryData.secondSalary.toFixed(2),
       workDaysInMonth: salaryData.workDaysInMonth,
       workStartTime,
       workEndTime,
@@ -117,7 +129,17 @@ Page({
         normal: todayEarnings.normal || 0,
         burnout: todayEarnings.burnout || 0,
         slack: todayEarnings.slack || 0
-      }
+      },
+      progressStartLabel: workStartTime,
+      progressEndLabel: workEndTime,
+      currentProgressLabel: '--:--' // 初始化为时间格式，会在updateAll时更新
+    });
+
+    // 更新统计小时数
+    this.updateStatsHours({
+      normal: todayEarnings.normal || 0,
+      burnout: todayEarnings.burnout || 0,
+      slack: todayEarnings.slack || 0
     });
 
     // 设置初始今日收入显示
@@ -341,6 +363,9 @@ Page({
 
     this.setData({ stats });
 
+    // 更新统计小时数
+    this.updateStatsHours(stats);
+
     // 更新激活愿望的进度
     this.updateActiveWishProgress(increment);
 
@@ -355,6 +380,101 @@ Page({
     return date1.getFullYear() === date2.getFullYear() &&
            date1.getMonth() === date2.getMonth() &&
            date1.getDate() === date2.getDate();
+  },
+
+  // 将金额转换为小时数
+  convertToHours(amount) {
+    const secondSalary = parseFloat(this.data.secondSalary);
+    if (secondSalary <= 0) return '0.0';
+    const hours = amount / secondSalary / 3600;
+    return hours.toFixed(1);
+  },
+
+  // 更新统计小时数
+  updateStatsHours(stats) {
+    this.setData({
+      statsHours: {
+        normal: this.convertToHours(stats.normal || 0),
+        burnout: this.convertToHours(stats.burnout || 0),
+        slack: this.convertToHours(stats.slack || 0)
+      }
+    });
+  },
+
+  // 获取本周工作日范围
+  getWeekWorkDays() {
+    const { config } = this.data;
+    if (!config || !config.workdays) {
+      return { firstDay: null, lastDay: null };
+    }
+
+    const now = new Date();
+    const today = now.getDay(); // 0-6, 0是周日
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (today === 0 ? 6 : today - 1)); // 调整到本周一
+    monday.setHours(0, 0, 0, 0);
+
+    let firstWorkDay = null;
+    let lastWorkDay = null;
+
+    // 遍历本周7天，找到第一个和最后一个工作日
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + i);
+
+      if (SalaryCalculator.isWorkDay(config.workdays, date)) {
+        if (!firstWorkDay) {
+          firstWorkDay = new Date(date);
+        }
+        lastWorkDay = new Date(date);
+      }
+    }
+
+    return { firstDay: firstWorkDay, lastDay: lastWorkDay };
+  },
+
+  // 获取本月工作日范围
+  getMonthWorkDays() {
+    const { config } = this.data;
+    if (!config || !config.workdays) {
+      return { firstDay: null, lastDay: null };
+    }
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    let firstWorkDay = null;
+    let lastWorkDay = null;
+
+    // 遍历本月所有天，找到第一个和最后一个工作日
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+
+      if (SalaryCalculator.isWorkDay(config.workdays, date)) {
+        if (!firstWorkDay) {
+          firstWorkDay = new Date(date);
+        }
+        lastWorkDay = new Date(date);
+      }
+    }
+
+    return { firstDay: firstWorkDay, lastDay: lastWorkDay };
+  },
+
+  // 格式化日期为显示文本
+  formatDateLabel(date, type) {
+    if (!date) return '--';
+
+    if (type === 'week') {
+      const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      return weekDays[date.getDay()];
+    } else if (type === 'month') {
+      return `${date.getDate()}号`;
+    }
+
+    return '--';
   },
 
   // 更新激活愿望进度
@@ -418,10 +538,201 @@ Page({
 
   // 切换维度
   onDimensionChange(e) {
+    const value = e.currentTarget.dataset.value;
     this.setData({
-      dimensionTab: e.detail.value
+      dimensionTab: value
     });
-    // TODO: 根据维度加载不同的数据
+
+    // 更新对应维度的数据
+    this.updateDimensionData(value);
+  },
+
+  // 更新维度数据
+  updateDimensionData(dimension) {
+    let earnings;
+
+    if (dimension === 'day') {
+      earnings = StorageManager.getTodayEarnings();
+    } else if (dimension === 'week') {
+      earnings = StorageManager.getWeekEarnings();
+    } else if (dimension === 'month') {
+      earnings = StorageManager.getMonthEarnings();
+    }
+
+    // 更新显示的金额
+    const total = earnings.total || 0;
+    const parts = total.toFixed(2).split('.');
+    const stats = {
+      normal: earnings.normal || 0,
+      burnout: earnings.burnout || 0,
+      slack: earnings.slack || 0
+    };
+
+    this.setData({
+      todayEarned: {
+        integer: parts[0],
+        decimal: parts[1]
+      },
+      stats
+    });
+
+    // 更新统计小时数
+    this.updateStatsHours(stats);
+
+    // 更新进度
+    this.updateProgressByDimension(dimension);
+  },
+
+  // 根据维度更新进度
+  updateProgressByDimension(dimension) {
+    const { config } = this.data;
+    if (!config || !config.segments.length) {
+      this.setData({
+        progress: 0,
+        progressStartLabel: '--',
+        progressEndLabel: '--'
+      });
+      return;
+    }
+
+    const now = new Date();
+
+    if (dimension === 'day') {
+      // 今日进度
+      const workedSeconds = SalaryCalculator.calculateTodayWorkedSeconds(config.segments, []);
+      const totalSeconds = SalaryCalculator.calculateDailyWorkSeconds(config.segments);
+      const progress = totalSeconds > 0 ? (workedSeconds / totalSeconds * 100).toFixed(1) : 0;
+
+      this.setData({
+        progress,
+        progressStartLabel: this.data.workStartTime,
+        progressEndLabel: this.data.workEndTime,
+        currentProgressLabel: this.data.currentTime // 日维度显示当前时间
+      });
+    } else if (dimension === 'week') {
+      // 本周进度
+      const { firstDay, lastDay } = this.getWeekWorkDays();
+
+      if (!firstDay || !lastDay) {
+        this.setData({
+          progress: 0,
+          progressStartLabel: '--',
+          progressEndLabel: '--'
+        });
+        return;
+      }
+
+      const dailySeconds = SalaryCalculator.calculateDailyWorkSeconds(config.segments);
+
+      // 计算本周工作日总数
+      let totalWeekWorkDays = 0;
+      const monday = new Date(now);
+      const today = now.getDay();
+      monday.setDate(now.getDate() - (today === 0 ? 6 : today - 1));
+      monday.setHours(0, 0, 0, 0);
+
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        if (SalaryCalculator.isWorkDay(config.workdays, date)) {
+          totalWeekWorkDays++;
+        }
+      }
+
+      const totalWeekSeconds = dailySeconds * totalWeekWorkDays;
+
+      // 计算本周已工作秒数
+      let workedWeekSeconds = 0;
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+
+        if (date > now) break; // 不计算未来的日期
+
+        const isWorkDay = SalaryCalculator.isWorkDay(config.workdays, date);
+        if (isWorkDay) {
+          if (this.isSameDay(date, now)) {
+            // 今天只计算已过去的时间
+            workedWeekSeconds += SalaryCalculator.calculateTodayWorkedSeconds(config.segments, []);
+          } else if (date < now) {
+            // 过去的日子算完整工作时间
+            workedWeekSeconds += dailySeconds;
+          }
+        }
+      }
+
+      const progress = totalWeekSeconds > 0 ? (workedWeekSeconds / totalWeekSeconds * 100).toFixed(1) : 0;
+
+      // 获取当前是周几
+      const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      const currentWeekDay = weekDays[now.getDay()];
+
+      this.setData({
+        progress,
+        progressStartLabel: this.formatDateLabel(firstDay, 'week'),
+        progressEndLabel: this.formatDateLabel(lastDay, 'week'),
+        currentProgressLabel: currentWeekDay // 周维度显示当前周几
+      });
+    } else if (dimension === 'month') {
+      // 本月进度
+      const { firstDay, lastDay } = this.getMonthWorkDays();
+
+      if (!firstDay || !lastDay) {
+        this.setData({
+          progress: 0,
+          progressStartLabel: '--',
+          progressEndLabel: '--'
+        });
+        return;
+      }
+
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const dailySeconds = SalaryCalculator.calculateDailyWorkSeconds(config.segments);
+
+      // 计算本月工作日总数
+      let totalWorkDays = 0;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        if (SalaryCalculator.isWorkDay(config.workdays, date)) {
+          totalWorkDays++;
+        }
+      }
+
+      const totalMonthSeconds = dailySeconds * totalWorkDays;
+
+      // 计算本月已工作秒数
+      let workedMonthSeconds = 0;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+
+        if (date > now) break; // 不计算未来的日期
+
+        const isWorkDay = SalaryCalculator.isWorkDay(config.workdays, date);
+        if (isWorkDay) {
+          if (this.isSameDay(date, now)) {
+            // 今天只计算已过去的时间
+            workedMonthSeconds += SalaryCalculator.calculateTodayWorkedSeconds(config.segments, []);
+          } else if (date < now) {
+            // 过去的日子算完整工作时间
+            workedMonthSeconds += dailySeconds;
+          }
+        }
+      }
+
+      const progress = totalMonthSeconds > 0 ? (workedMonthSeconds / totalMonthSeconds * 100).toFixed(1) : 0;
+
+      // 获取当前是几号
+      const currentDay = `${now.getDate()}号`;
+
+      this.setData({
+        progress,
+        progressStartLabel: this.formatDateLabel(firstDay, 'month'),
+        progressEndLabel: this.formatDateLabel(lastDay, 'month'),
+        currentProgressLabel: currentDay // 月维度显示当前几号
+      });
+    }
   },
 
   // 切换模式
