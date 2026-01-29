@@ -81,58 +81,81 @@
     <text class="fab-icon">+</text>
   </view>
 
-  <!-- 创建愿望对话框 -->
-  <t-dialog
-    visible="{{showCreateDialog}}"
-    title="创建攒钱愿望"
-    confirm-btn="创建"
-    cancel-btn="取消"
-    bind:confirm="confirmCreate"
-    bind:cancel="cancelCreate"
-  >
-    <view class="create-dialog-content">
-      <!-- 标题输入 -->
-      <view class="dialog-field">
-        <text class="field-label">愿望名称</text>
-        <input
-          class="field-input"
-          placeholder="例如：AirPods Pro"
-          value="{{newWish.name}}"
-          bindinput="onWishNameInput"
-          maxlength="20"
-        />
+  <!-- 自定义创建愿望弹窗 -->
+  <view class="modal-overlay" wx:if="{{showCreateDialog}}" bindtap="cancelCreate">
+    <view class="modal-container" catchtap="stopPropagation">
+      <!-- 标题 -->
+      <view class="modal-header">
+        <text class="modal-title">创建攒钱愿望</text>
       </view>
 
-      <!-- 金额输入 -->
-      <view class="dialog-field">
-        <text class="field-label">目标金额</text>
-        <view class="amount-input-wrapper">
-          <text class="amount-symbol">¥</text>
+      <!-- 内容 -->
+      <view class="modal-content">
+        <!-- 愿望名称 -->
+        <view class="form-field">
+          <text class="field-label">愿望名称</text>
           <input
-            class="field-input amount-input"
-            type="digit"
-            placeholder="0.00"
-            value="{{newWish.amount}}"
-            bindinput="onWishAmountInput"
+            class="field-input"
+            placeholder="例如：AirPods Pro"
+            placeholder-style="color: #999999; font-size: 28rpx;"
+            value="{{newWish.name}}"
+            bindinput="onWishNameInput"
+            maxlength="20"
+            cursor-spacing="20"
+            confirm-type="next"
           />
         </view>
-      </view>
 
-      <!-- 图标选择 -->
-      <view class="dialog-field">
-        <text class="field-label">选择图标</text>
-        <view class="emoji-selector">
-          <view
-            class="emoji-item {{newWish.emoji === item ? 'selected' : ''}}"
-            wx:for="{{emojiOptions}}"
-            wx:key="*this"
-            bindtap="selectEmoji"
-            data-emoji="{{item}}"
-          >
-            <text class="emoji-text">{{item}}</text>
+        <!-- 目标金额 -->
+        <view class="form-field">
+          <text class="field-label">目标金额</text>
+          <view class="amount-wrapper">
+            <text class="amount-prefix">¥</text>
+            <input
+              class="field-input amount-input"
+              type="digit"
+              placeholder="0.00"
+              placeholder-style="color: #999999; font-size: 28rpx;"
+              value="{{newWish.amount}}"
+              bindinput="onWishAmountInput"
+              cursor-spacing="20"
+              confirm-type="done"
+            />
+          </view>
+        </view>
+
+        <!-- 选择图标 -->
+        <view class="form-field">
+          <text class="field-label">选择图标</text>
+          <view class="emoji-grid">
+            <view
+              class="emoji-option {{newWish.emoji === item ? 'selected' : ''}}"
+              wx:for="{{emojiOptions}}"
+              wx:key="*this"
+              bindtap="selectEmoji"
+              data-emoji="{{item}}"
+            >
+              {{item}}
+            </view>
+            <view class="emoji-option emoji-input-wrapper {{customEmoji ? 'selected' : ''}}">
+              <input
+                class="emoji-input"
+                placeholder="+"
+                placeholder-style="color: #999999; font-size: 40rpx;"
+                value="{{customEmoji}}"
+                bindinput="onCustomEmojiInput"
+                maxlength="2"
+              />
+            </view>
           </view>
         </view>
       </view>
+
+      <!-- 底部按钮 -->
+      <view class="modal-footer">
+        <view class="modal-btn cancel-btn" bindtap="cancelCreate">取消</view>
+        <view class="modal-btn confirm-btn" bindtap="confirmCreate">创建</view>
+      </view>
     </view>
-  </t-dialog>
+  </view>
 </view>

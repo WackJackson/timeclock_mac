@@ -183,8 +183,8 @@ Page({
       this.updateEarnings(now);
     }
 
-    // 更新进度
-    this.updateProgress(now);
+    // 更新进度（根据当前维度）
+    this.updateProgressByDimension(this.data.dimensionTab);
 
     // 更新倒计时
     this.updateCountdowns(now);
@@ -505,27 +505,6 @@ Page({
       burnout: this.data.stats.burnout,
       slack: this.data.stats.slack
     });
-  },
-
-  // 更新进度
-  updateProgress(now) {
-    const { config, workStartTime, workEndTime } = this.data;
-
-    if (!config || !config.segments.length) {
-      this.setData({ progress: 0 });
-      return;
-    }
-
-    // 计算今日已工作秒数
-    const workedSeconds = SalaryCalculator.calculateTodayWorkedSeconds(config.segments, []);
-
-    // 计算今日总工作秒数
-    const totalSeconds = SalaryCalculator.calculateDailyWorkSeconds(config.segments);
-
-    // 计算进度
-    const progress = totalSeconds > 0 ? (workedSeconds / totalSeconds * 100).toFixed(1) : 0;
-
-    this.setData({ progress });
   },
 
   // 更新倒计时

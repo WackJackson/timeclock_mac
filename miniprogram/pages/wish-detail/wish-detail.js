@@ -1,83 +1,30 @@
+const { StorageManager } = require('../../utils/storage-manager.js');
+
 Page({
   data: {
     wishId: 0,
     wishData: {
-      name: 'AirPods Pro 2',
-      emoji: '🎧',
-      color: 'linear-gradient(135deg, #fbbf24 0%, #f97316 100%)',
-      description: '降噪耳机,专注工作必备',
-      currentAmount: '1,245.50',
-      targetAmount: '1,899.00',
-      progress: 65.6,
-      status: 'active'
+      name: '',
+      emoji: '🎯',
+      color: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+      description: '',
+      currentAmount: '0.00',
+      targetAmount: '0.00',
+      progress: 0,
+      status: 'waiting'
+    },
+    modeProgress: {
+      normal: 0,
+      burnout: 0,
+      slack: 0
     },
     stats: {
-      savedDays: 8,
-      estimatedDays: 4,
-      dailyAverage: '155.69'
+      savedDays: 0,
+      estimatedDays: 0,
+      totalMinutes: 0
     },
-    records: [
-      {
-        id: 1,
-        segmentName: '下午搬砖',
-        modeName: '普通模式',
-        modeTheme: 'primary',
-        date: '01-25',
-        timeRange: '14:00 - 18:00',
-        amount: '172.80',
-        icon: '⚡',
-        iconBg: '#ecf2fe',
-        amountColor: '#0052d9'
-      },
-      {
-        id: 2,
-        segmentName: '上午搬砖',
-        modeName: '燃尽模式',
-        modeTheme: 'warning',
-        date: '01-25',
-        timeRange: '09:00 - 12:00',
-        amount: '129.60',
-        icon: '🔥',
-        iconBg: '#fff0e6',
-        amountColor: '#ed7b2f'
-      },
-      {
-        id: 3,
-        segmentName: '下午搬砖',
-        modeName: '摸鱼模式',
-        modeTheme: 'success',
-        date: '01-24',
-        timeRange: '14:00 - 18:00',
-        amount: '172.80',
-        icon: '🐟',
-        iconBg: '#e0f7f1',
-        amountColor: '#00a870'
-      },
-      {
-        id: 4,
-        segmentName: '上午搬砖',
-        modeName: '普通模式',
-        modeTheme: 'primary',
-        date: '01-24',
-        timeRange: '09:00 - 12:00',
-        amount: '129.60',
-        icon: '⚡',
-        iconBg: '#ecf2fe',
-        amountColor: '#0052d9'
-      },
-      {
-        id: 5,
-        segmentName: '下午搬砖',
-        modeName: '普通模式',
-        modeTheme: 'primary',
-        date: '01-23',
-        timeRange: '14:00 - 18:00',
-        amount: '172.80',
-        icon: '⚡',
-        iconBg: '#ecf2fe',
-        amountColor: '#0052d9'
-      }
-    ]
+    records: [],
+    refreshTimer: null
   },
 
   onLoad(options) {
@@ -89,10 +36,261 @@ Page({
     }
   },
 
+  onShow() {
+    // 每次显示页面时重新加载数据，以便看到最新进度
+    if (this.data.wishId) {
+      this.loadWishData();
+
+      // 启动定时刷新（每2秒刷新一次）
+      this.data.refreshTimer = setInterval(() => {
+        this.loadWishData();
+      }, 2000);
+    }
+  },
+
+  onHide() {
+    // 页面隐藏时清除定时器
+    if (this.data.refreshTimer) {
+      clearInterval(this.data.refreshTimer);
+      this.data.refreshTimer = null;
+    }
+  },
+
+  onUnload() {
+    // 页面卸载时清除定时器
+    if (this.data.refreshTimer) {
+      clearInterval(this.data.refreshTimer);
+      this.data.refreshTimer = null;
+    }
+  },
+
   // 加载愿望数据
   loadWishData() {
-    // 这里应该根据 wishId 从存储中加载数据
-    // 暂时使用示例数据
+    const wishes = StorageManager.getWishes();
+    const wish = wishes.find(w => w.id === this.data.wishId);
+
+    if (!wish) {
+      wx.showToast({
+        title: '愿望不存在',
+        icon: 'none'
+      });
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1500);
+      return;
+    }
+
+    // 获取激活的愿望ID
+    const activeWishId = StorageManager.getActiveWish();
+
+    // 计算进度
+    const current = parseFloat(wish.currentAmount || 0);
+    const target = parseFloat(wish.targetAmount || 0);
+    const progress = target > 0 ? Math.round((current / target) * 100) : 0;
+
+    // 判断状态
+    let status = 'waiting';
+    if (progress >= 100) {
+      status = 'completed';
+    } else if (wish.id === activeWishId) {
+      status = 'active';
+    }
+
+    // 获取愿望的资金记录
+    const records = wish.records || [];
+
+    // 计算每种模式的进度
+    const modeProgress = this.calculateModeProgress(records, target);
+
+    // 计算统计数据
+    const stats = this.calculateStats(wish, records);
+
+    // 格式化资金记录
+    const formattedRecords = this.formatRecords(records);
+
+    // 更新数据
+    this.setData({
+      wishData: {
+        ...wish,
+        currentAmount: this.formatMoney(current),
+        targetAmount: this.formatMoney(target),
+        progress: progress,
+        status: status
+      },
+      modeProgress: modeProgress,
+      stats: stats,
+      records: formattedRecords
+    });
+  },
+
+  // 计算每种模式的进度百分比
+  calculateModeProgress(records, targetAmount) {
+    const modeStats = {
+      normal: 0,
+      burnout: 0,
+      slack: 0
+    };
+
+    // 按模式汇总金额
+    records.forEach(record => {
+      const mode = record.mode || 'normal';
+      const amount = parseFloat(record.amount || 0);
+      if (modeStats[mode] !== undefined) {
+        modeStats[mode] += amount;
+      }
+    });
+
+    // 计算每种模式的进度百分比
+    const result = {
+      normal: targetAmount > 0 ? Math.round((modeStats.normal / targetAmount) * 100 * 10) / 10 : 0,
+      burnout: targetAmount > 0 ? Math.round((modeStats.burnout / targetAmount) * 100 * 10) / 10 : 0,
+      slack: targetAmount > 0 ? Math.round((modeStats.slack / targetAmount) * 100 * 10) / 10 : 0
+    };
+
+    // 确保总进度不超过100%
+    const total = result.normal + result.burnout + result.slack;
+    if (total > 100) {
+      const ratio = 100 / total;
+      result.normal = Math.round(result.normal * ratio * 10) / 10;
+      result.burnout = Math.round(result.burnout * ratio * 10) / 10;
+      result.slack = Math.round(result.slack * ratio * 10) / 10;
+    }
+
+    return result;
+  },
+
+  // 计算统计数据
+  calculateStats(wish, records) {
+    if (records.length === 0) {
+      return {
+        savedDays: 0,
+        estimatedDays: 0,
+        totalMinutes: 0
+      };
+    }
+
+    // 计算已攒天数（从创建日期到现在）
+    const createdDate = wish.createdDate;
+    const today = StorageManager.getTodayKey();
+    const savedDays = this.getDaysBetween(createdDate, today);
+
+    // 计算日均金额
+    const totalAmount = records.reduce((sum, record) => {
+      return sum + parseFloat(record.amount || 0);
+    }, 0);
+    const dailyAverage = savedDays > 0 ? totalAmount / savedDays : 0;
+
+    // 计算预计完成天数
+    const current = parseFloat(wish.currentAmount || 0);
+    const target = parseFloat(wish.targetAmount || 0);
+    const remaining = target - current;
+    const estimatedDays = dailyAverage > 0 ? Math.ceil(remaining / dailyAverage) : 0;
+
+    // 计算所需总时长（分钟）
+    const userConfig = StorageManager.getUserConfig();
+    const hourlyRate = userConfig ? parseFloat(userConfig.hourlyRate || 0) : 0;
+    const totalMinutes = hourlyRate > 0 ? Math.round((totalAmount / hourlyRate) * 60) : 0;
+
+    return {
+      savedDays: savedDays,
+      estimatedDays: estimatedDays > 0 ? estimatedDays : 0,
+      totalMinutes: totalMinutes
+    };
+  },
+
+  // 格式化资金记录
+  formatRecords(records) {
+    if (records.length === 0) {
+      return [];
+    }
+
+    // 获取时薪设置
+    const userConfig = StorageManager.getUserConfig();
+    const hourlyRate = userConfig ? parseFloat(userConfig.hourlyRate || 0) : 0;
+
+    // 按模式汇总金额和时长
+    const modeStats = {
+      normal: { total: 0, minutes: 0 },
+      burnout: { total: 0, minutes: 0 },
+      slack: { total: 0, minutes: 0 }
+    };
+
+    records.forEach(record => {
+      const mode = record.mode || 'normal';
+      const amount = parseFloat(record.amount || 0);
+      if (modeStats[mode]) {
+        modeStats[mode].total += amount;
+        // 计算时长（分钟） = 金额 / 时薪 * 60
+        if (hourlyRate > 0) {
+          modeStats[mode].minutes += (amount / hourlyRate) * 60;
+        }
+      }
+    });
+
+    // 转换为显示数组
+    const result = [];
+
+    if (modeStats.normal.total > 0) {
+      result.push({
+        id: 'normal',
+        modeName: '普通模式',
+        modeTheme: 'primary',
+        icon: '⚡',
+        iconBg: '#ecf2fe',
+        amountColor: '#0052d9',
+        amount: this.formatMoney(modeStats.normal.total),
+        minutes: Math.round(modeStats.normal.minutes)
+      });
+    }
+
+    if (modeStats.burnout.total > 0) {
+      result.push({
+        id: 'burnout',
+        modeName: '燃尽模式',
+        modeTheme: 'warning',
+        icon: '🔥',
+        iconBg: '#fff0e6',
+        amountColor: '#ed7b2f',
+        amount: this.formatMoney(modeStats.burnout.total),
+        minutes: Math.round(modeStats.burnout.minutes)
+      });
+    }
+
+    if (modeStats.slack.total > 0) {
+      result.push({
+        id: 'slack',
+        modeName: '摸鱼模式',
+        modeTheme: 'success',
+        icon: '🐟',
+        iconBg: '#e0f7f1',
+        amountColor: '#00a870',
+        amount: this.formatMoney(modeStats.slack.total),
+        minutes: Math.round(modeStats.slack.minutes)
+      });
+    }
+
+    return result;
+  },
+
+  // 计算两个日期之间的天数
+  getDaysBetween(dateStr1, dateStr2) {
+    const date1 = this.parseDate(dateStr1);
+    const date2 = this.parseDate(dateStr2);
+    const diffTime = Math.abs(date2 - date1);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  },
+
+  // 解析日期字符串
+  parseDate(dateStr) {
+    // dateStr 格式: 2026-01-29
+    const parts = dateStr.split('-');
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  },
+
+  // 格式化金额
+  formatMoney(amount) {
+    return amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   },
 
   // 返回
@@ -130,13 +328,28 @@ Page({
       confirmColor: '#e34d59',
       success: (res) => {
         if (res.confirm) {
-          wx.showToast({
-            title: '删除成功',
-            icon: 'success'
-          });
-          setTimeout(() => {
-            wx.navigateBack();
-          }, 1500);
+          // 从存储中删除愿望
+          const wishes = StorageManager.getWishes();
+          const index = wishes.findIndex(w => w.id === this.data.wishId);
+
+          if (index > -1) {
+            wishes.splice(index, 1);
+            StorageManager.saveWishes(wishes);
+
+            // 如果删除的是激活的愿望，清除激活状态
+            const activeWishId = StorageManager.getActiveWish();
+            if (activeWishId === this.data.wishId) {
+              StorageManager.setActiveWish(null);
+            }
+
+            wx.showToast({
+              title: '删除成功',
+              icon: 'success'
+            });
+            setTimeout(() => {
+              wx.navigateBack();
+            }, 1500);
+          }
         }
       }
     });
@@ -152,6 +365,7 @@ Page({
 
   // 设为进行中
   setActive() {
+    StorageManager.setActiveWish(this.data.wishId);
     this.setData({
       'wishData.status': 'active'
     });
@@ -163,6 +377,7 @@ Page({
 
   // 暂停攒钱
   pauseWish() {
+    StorageManager.setActiveWish(null);
     this.setData({
       'wishData.status': 'waiting'
     });

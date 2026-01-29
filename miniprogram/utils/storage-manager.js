@@ -182,8 +182,28 @@ class StorageManager {
       const wish = wishes.find(w => w.id === wishId);
 
       if (wish) {
-        wish.currentAmount = (parseFloat(wish.currentAmount.replace(/,/g, '')) + amount).toFixed(2);
-        wish.progress = Math.min(100, (parseFloat(wish.currentAmount) / parseFloat(wish.targetAmount.replace(/,/g, '')) * 100).toFixed(1));
+        // 如果愿望已经完成，不再更新进度
+        if (wish.status === 'completed' || wish.progress >= 100) {
+          console.log('愿望已完成，不再更新进度');
+          return true;
+        }
+
+        // 处理 currentAmount 和 targetAmount，兼容数字和字符串格式
+        const currentAmount = typeof wish.currentAmount === 'number'
+          ? wish.currentAmount
+          : parseFloat((wish.currentAmount || '0').toString().replace(/,/g, ''));
+
+        const targetAmount = typeof wish.targetAmount === 'number'
+          ? wish.targetAmount
+          : parseFloat((wish.targetAmount || '0').toString().replace(/,/g, ''));
+
+        // 计算新的金额，但不超过目标金额
+        const newAmount = Math.min(currentAmount + amount, targetAmount);
+        wish.currentAmount = newAmount;
+
+        // 计算进度
+        const progress = targetAmount > 0 ? (wish.currentAmount / targetAmount) * 100 : 0;
+        wish.progress = Math.min(100, Math.round(progress * 10) / 10);
 
         // 保存资金来源记录
         if (!wish.records) {
@@ -195,6 +215,23 @@ class StorageManager {
         if (wish.progress >= 100) {
           wish.status = 'completed';
           wish.completedDate = this.getTodayKey();
+
+          // 清除当前激活状态
+          this.setActiveWish(null);
+
+          // 查找下一个等待中的愿望并自动激活
+          // 按创建时间排序，找到第一个未完成的愿望
+          const waitingWishes = wishes
+            .filter(w => w.status !== 'completed' && w.progress < 100 && w.id !== wishId)
+            .sort((a, b) => {
+              const dateA = a.createdDate || '0000-00-00';
+              const dateB = b.createdDate || '0000-00-00';
+              return dateA.localeCompare(dateB); // 正序：最早创建的优先
+            });
+
+          if (waitingWishes.length > 0) {
+            this.setActiveWish(waitingWishes[0].id);
+          }
         }
 
         this.saveWishes(wishes);

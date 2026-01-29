@@ -14,8 +14,10 @@ Page({
     emojiOptions: [
       '🎧', '🎮', '👟', '✈️', '📱', '💻', '⌚', '📷',
       '🎸', '🏀', '🚗', '🏠', '💍', '📚', '🎯', '🎨',
-      '🎬', '🎤', '🎪', '🎭', '🎺', '🎻', '🎹', '🥁'
-    ]
+      '🎬', '🎤', '🎪', '🎭', '🎺', '🎻', '🎹'
+    ],
+    customEmoji: '',
+    refreshTimer: null
   },
 
   onLoad() {
@@ -25,12 +27,40 @@ Page({
   onShow() {
     // 每次显示页面时重新加载，以便更新数据
     this.loadWishes();
+
+    // 启动定时刷新（每2秒刷新一次）
+    this.data.refreshTimer = setInterval(() => {
+      this.loadWishes();
+    }, 2000);
+  },
+
+  onHide() {
+    // 页面隐藏时清除定时器
+    if (this.data.refreshTimer) {
+      clearInterval(this.data.refreshTimer);
+      this.data.refreshTimer = null;
+    }
+  },
+
+  onUnload() {
+    // 页面卸载时清除定时器
+    if (this.data.refreshTimer) {
+      clearInterval(this.data.refreshTimer);
+      this.data.refreshTimer = null;
+    }
   },
 
   // 加载愿望列表
   loadWishes() {
     const wishes = StorageManager.getWishes();
     const activeWishId = StorageManager.getActiveWish();
+
+    // 按创建时间倒序排列（最新的在前面）
+    wishes.sort((a, b) => {
+      const dateA = a.createdDate || '0000-00-00';
+      const dateB = b.createdDate || '0000-00-00';
+      return dateB.localeCompare(dateA);
+    });
 
     // 格式化愿望数据用于显示
     const formattedWishes = wishes.map(wish => {
@@ -111,7 +141,8 @@ Page({
         name: '',
         amount: '',
         emoji: '🎯'
-      }
+      },
+      customEmoji: ''
     });
   },
 
@@ -133,7 +164,17 @@ Page({
   selectEmoji(e) {
     const emoji = e.currentTarget.dataset.emoji;
     this.setData({
-      'newWish.emoji': emoji
+      'newWish.emoji': emoji,
+      customEmoji: ''
+    });
+  },
+
+  // 输入自定义emoji
+  onCustomEmojiInput(e) {
+    const value = e.detail.value;
+    this.setData({
+      customEmoji: value,
+      'newWish.emoji': value || '🎯'
     });
   },
 
@@ -187,8 +228,9 @@ Page({
     wishes.push(newWishItem);
     StorageManager.saveWishes(wishes);
 
-    // 如果是第一个愿望，自动设为激活
-    if (wishes.length === 1) {
+    // 如果当前没有进行中的愿望，自动设为激活
+    const activeWishId = StorageManager.getActiveWish();
+    if (!activeWishId) {
       StorageManager.setActiveWish(newId);
     }
 
@@ -210,5 +252,10 @@ Page({
     this.setData({
       showCreateDialog: false
     });
+  },
+
+  // 阻止事件冒泡
+  stopPropagation() {
+    // 空函数，阻止点击事件冒泡到overlay
   }
 });
