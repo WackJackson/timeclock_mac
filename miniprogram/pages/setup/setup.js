@@ -286,7 +286,7 @@ Page({
       return;
     }
 
-    if (this.data.step < 3) {
+    if (this.data.step < 4) {
       this.setData({
         step: this.data.step + 1
       });
@@ -327,15 +327,7 @@ Page({
       }
     }
 
-    if (step === 4) {
-      if (!formData.firstWorkDate) {
-        wx.showToast({
-          title: '请选择首次工作日期',
-          icon: 'none'
-        });
-        return false;
-      }
-    }
+    // 步骤4工龄设置是可选的，不需要验证
 
     return true;
   },
