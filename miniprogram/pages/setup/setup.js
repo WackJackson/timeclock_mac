@@ -320,5 +320,38 @@ Page({
         icon: 'none'
       });
     }
+  },
+
+  // 编辑模式保存
+  saveEdit() {
+    // 验证当前步骤的数据
+    if (!this.validateStep()) {
+      return;
+    }
+
+    // 保存配置
+    const success = StorageManager.saveUserConfig(this.data.formData);
+
+    if (success) {
+      wx.showToast({
+        title: '保存成功',
+        icon: 'success'
+      });
+
+      // 返回上一页
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1500);
+    } else {
+      wx.showToast({
+        title: '保存失败，请重试',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 返回上一页
+  goBack() {
+    wx.navigateBack();
   }
 });

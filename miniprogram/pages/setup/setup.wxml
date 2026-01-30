@@ -1,12 +1,20 @@
 <view class="setup-container">
-  <!-- 头部 -->
-  <view class="header">
+  <!-- 头部（仅首次设置时显示） -->
+  <view class="header" wx:if="{{!isEditMode}}">
     <text class="title">欢迎使用</text>
     <text class="subtitle">完成设置后开启你的时薪观察之旅</text>
   </view>
 
-  <!-- 进度指示器 -->
-  <view class="progress-indicator">
+  <!-- 编辑模式标题 -->
+  <view class="edit-header" wx:if="{{isEditMode}}">
+    <view class="edit-title-row">
+      <text class="edit-icon" bindtap="goBack">←</text>
+      <text class="edit-title">参数设置</text>
+    </view>
+  </view>
+
+  <!-- 进度指示器（仅首次设置时显示） -->
+  <view class="progress-indicator" wx:if="{{!isEditMode}}">
     <view class="progress-bars">
       <view class="progress-bar {{step >= 1 ? 'active' : ''}}"></view>
       <view class="progress-bar {{step >= 2 ? 'active' : ''}}"></view>
@@ -130,8 +138,20 @@
 
   <!-- 底部按钮 -->
   <view class="bottom-actions">
+    <!-- 编辑模式：直接保存 -->
     <t-button
-      wx:if="{{step < 3}}"
+      wx:if="{{isEditMode}}"
+      theme="primary"
+      size="large"
+      block
+      bindtap="saveEdit"
+    >
+      保存
+    </t-button>
+
+    <!-- 首次设置模式：下一步/完成设置 -->
+    <t-button
+      wx:if="{{!isEditMode && step < 3}}"
       theme="primary"
       size="large"
       block
@@ -140,7 +160,7 @@
       下一步
     </t-button>
     <t-button
-      wx:if="{{step === 3}}"
+      wx:if="{{!isEditMode && step === 3}}"
       theme="primary"
       size="large"
       block
