@@ -4,7 +4,8 @@
     "pages/setup/setup",
     "pages/savings/savings",
     "pages/wish-detail/wish-detail",
-    "pages/profile/profile"
+    "pages/profile/profile",
+    "pages/author/author"
   ],
   "window": {
     "navigationBarTextStyle": "black",

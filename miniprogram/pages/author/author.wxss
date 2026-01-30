@@ -1,0 +1,127 @@
+.author-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 96rpx 48rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 作者头像 */
+.author-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 96rpx;
+}
+
+.author-avatar {
+  width: 256rpx;
+  height: 256rpx;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 160rpx;
+  box-shadow: 0 32rpx 64rpx rgba(0, 0, 0, 0.2);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20rpx);
+  }
+}
+
+.author-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: white;
+  opacity: 0.9;
+}
+
+/* 信息卡片 */
+.info-card {
+  width: 100%;
+  background: white;
+  border-radius: 32rpx;
+  padding: 48rpx;
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.15);
+  margin-bottom: 48rpx;
+}
+
+.info-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+}
+
+.wechat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wechat-id {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #242424;
+  letter-spacing: 2rpx;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 32rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 48rpx;
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.3);
+}
+
+.copy-icon {
+  font-size: 28rpx;
+}
+
+.copy-text {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: white;
+}
+
+/* 反馈提示 */
+.feedback-tips {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 32rpx;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20rpx);
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+}
+
+.tips-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: white;
+}
+
+.tips-content {
+  font-size: 24rpx;
+  color: white;
+  opacity: 0.85;
+  line-height: 1.6;
+}

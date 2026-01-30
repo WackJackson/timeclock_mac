@@ -315,26 +315,8 @@ Page({
 
   // 帮助与反馈
   showHelp() {
-    wx.showModal({
-      title: '🦹🏿‍♂️ 作者信息',
-      content: '作者微信号：WackJackson\n\n欢迎添加微信交流反馈！',
-      showCancel: true,
-      cancelText: '知道了',
-      confirmText: '复制微信号',
-      success: (res) => {
-        if (res.confirm) {
-          // 复制微信号到剪贴板
-          wx.setClipboardData({
-            data: 'WackJackson',
-            success: () => {
-              wx.showToast({
-                title: '微信号已复制',
-                icon: 'success'
-              });
-            }
-          });
-        }
-      }
+    wx.navigateTo({
+      url: '/pages/author/author'
     });
   },
 

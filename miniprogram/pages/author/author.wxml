@@ -1,0 +1,25 @@
+<view class="author-container">
+  <!-- 作者头像 -->
+  <view class="author-header">
+    <view class="author-avatar">{{authorEmoji}}</view>
+    <text class="author-title">作者</text>
+  </view>
+
+  <!-- 微信信息卡片 -->
+  <view class="info-card">
+    <view class="info-label">微信号</view>
+    <view class="wechat-row">
+      <text class="wechat-id">{{wechatId}}</text>
+      <view class="copy-btn" bindtap="copyWechatId">
+        <text class="copy-icon">📋</text>
+        <text class="copy-text">复制</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 反馈提示 -->
+  <view class="feedback-tips">
+    <text class="tips-title">💬 欢迎反馈</text>
+    <text class="tips-content">如有任何问题或建议，欢迎添加微信交流！</text>
+  </view>
+</view>
