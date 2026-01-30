@@ -490,6 +490,163 @@ class StorageManager {
       return false;
     }
   }
+
+  /**
+   * 获取所有业务数据（用于同步）
+   * @returns {Object} 所有业务数据
+   */
+  static getAllData() {
+    try {
+      return {
+        userConfig: this.getUserConfig(),
+        workRecords: this.getWorkRecords(),
+        wishes: this.getWishes(),
+        activeWish: this.getActiveWish(),
+        todayEarnings: this.getTodayEarnings(),
+        todayEarningsHistory: wx.getStorageSync('todayEarnings_history') || {},
+        firstWorkDate: this.getFirstWorkDate(),
+        currentMode: this.getCurrentMode()
+      };
+    } catch (e) {
+      console.error('获取所有数据失败:', e);
+      return null;
+    }
+  }
+
+  /**
+   * 保存所有业务数据（从云端恢复）
+   * @param {Object} data 业务数据
+   */
+  static setAllData(data) {
+    try {
+      if (data.userConfig) {
+        this.saveUserConfig(data.userConfig);
+      }
+      if (data.workRecords) {
+        wx.setStorageSync(STORAGE_KEYS.WORK_RECORDS, data.workRecords);
+      }
+      if (data.wishes) {
+        this.saveWishes(data.wishes);
+      }
+      if (data.activeWish !== undefined) {
+        this.setActiveWish(data.activeWish);
+      }
+      if (data.todayEarnings) {
+        wx.setStorageSync(STORAGE_KEYS.TODAY_EARNINGS, data.todayEarnings);
+      }
+      if (data.todayEarningsHistory) {
+        wx.setStorageSync('todayEarnings_history', data.todayEarningsHistory);
+      }
+      if (data.firstWorkDate) {
+        this.setFirstWorkDate(data.firstWorkDate);
+      }
+      if (data.currentMode) {
+        this.setCurrentMode(data.currentMode);
+      }
+      return true;
+    } catch (e) {
+      console.error('保存所有数据失败:', e);
+      return false;
+    }
+  }
+
+  /**
+   * 上传数据到云端
+   */
+  static async uploadToCloud() {
+    try {
+      const localData = this.getAllData();
+
+      const result = await wx.cloud.callFunction({
+        name: 'syncData',
+        data: {
+          action: 'upload',
+          data: localData
+        }
+      });
+
+      if (result.result.success) {
+        // 保存最后同步时间
+        wx.setStorageSync('lastSyncTime', result.result.syncTime);
+        return { success: true, message: result.result.message };
+      } else {
+        throw new Error(result.result.error);
+      }
+    } catch (e) {
+      console.error('上传数据失败:', e);
+      return { success: false, error: e.message };
+    }
+  }
+
+  /**
+   * 从云端下载数据
+   */
+  static async downloadFromCloud() {
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'syncData',
+        data: {
+          action: 'download'
+        }
+      });
+
+      if (result.result.success && result.result.hasData) {
+        // 保存到本地
+        this.setAllData(result.result.data);
+        // 保存最后同步时间
+        wx.setStorageSync('lastSyncTime', result.result.data.lastSyncTime);
+        return { success: true, message: result.result.message, hasData: true };
+      } else if (result.result.success && !result.result.hasData) {
+        return { success: true, message: result.result.message, hasData: false };
+      } else {
+        throw new Error(result.result.error);
+      }
+    } catch (e) {
+      console.error('下载数据失败:', e);
+      return { success: false, error: e.message };
+    }
+  }
+
+  /**
+   * 智能同步（合并本地和云端数据）
+   */
+  static async syncWithCloud() {
+    try {
+      const localData = this.getAllData();
+
+      const result = await wx.cloud.callFunction({
+        name: 'syncData',
+        data: {
+          action: 'sync',
+          data: localData
+        }
+      });
+
+      if (result.result.success) {
+        // 保存合并后的数据到本地
+        this.setAllData(result.result.data);
+        // 保存最后同步时间
+        wx.setStorageSync('lastSyncTime', result.result.syncTime);
+        return { success: true, message: result.result.message };
+      } else {
+        throw new Error(result.result.error);
+      }
+    } catch (e) {
+      console.error('同步数据失败:', e);
+      return { success: false, error: e.message };
+    }
+  }
+
+  /**
+   * 获取最后同步时间
+   */
+  static getLastSyncTime() {
+    try {
+      return wx.getStorageSync('lastSyncTime');
+    } catch (e) {
+      return null;
+    }
+  }
 }
 
 module.exports = {

@@ -96,6 +96,9 @@ Page({
               title: cloudResult.result.message,
               icon: 'success'
             });
+
+            // 登录成功后自动同步数据
+            this.autoSyncData(cloudResult.result.isNewUser);
           } else {
             throw new Error(cloudResult.result.error || '登录失败');
           }
@@ -425,6 +428,75 @@ Page({
     wx.navigateTo({
       url: '/pages/author/author'
     });
+  },
+
+  // 自动同步数据（登录后调用）
+  async autoSyncData(isNewUser) {
+    try {
+      if (isNewUser) {
+        // 新用户：上传本地数据到云端
+        const result = await StorageManager.uploadToCloud();
+        if (result.success) {
+          console.log('新用户数据已上传到云端');
+        }
+      } else {
+        // 老用户：智能同步（合并云端和本地数据）
+        const result = await StorageManager.syncWithCloud();
+        if (result.success) {
+          console.log('数据同步成功');
+          // 刷新页面数据
+          this.loadUserData();
+        }
+      }
+    } catch (err) {
+      console.error('自动同步失败:', err);
+    }
+  },
+
+  // 手动同步数据
+  async handleSync() {
+    const userInfo = StorageManager.getUserInfo();
+    if (!userInfo.isLogin) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      return;
+    }
+
+    wx.showLoading({
+      title: '同步中...',
+      mask: true
+    });
+
+    try {
+      const result = await StorageManager.syncWithCloud();
+      wx.hideLoading();
+
+      if (result.success) {
+        // 刷新页面数据
+        this.loadUserData();
+
+        const lastSyncTime = StorageManager.getLastSyncTime();
+        const timeStr = lastSyncTime ? new Date(lastSyncTime).toLocaleString('zh-CN') : '';
+
+        wx.showModal({
+          title: '同步成功',
+          content: `数据已成功同步\n\n最后同步时间：\n${timeStr}`,
+          showCancel: false,
+          confirmText: '知道了'
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err) {
+      wx.hideLoading();
+      wx.showModal({
+        title: '同步失败',
+        content: err.message || '请检查网络连接',
+        showCancel: false
+      });
+    }
   },
 
   // 关于
