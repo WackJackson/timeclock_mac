@@ -23,6 +23,8 @@ class StorageManager {
   static saveUserConfig(config) {
     try {
       wx.setStorageSync(STORAGE_KEYS.USER_CONFIG, config);
+      // 自动同步到云端
+      this.autoSyncToCloud();
       return true;
     } catch (e) {
       console.error('保存用户配置失败:', e);
@@ -102,6 +104,8 @@ class StorageManager {
   static saveWishes(wishes) {
     try {
       wx.setStorageSync(STORAGE_KEYS.WISHES, wishes);
+      // 自动同步到云端
+      this.autoSyncToCloud();
       return true;
     } catch (e) {
       console.error('保存愿望列表失败:', e);
@@ -646,6 +650,42 @@ class StorageManager {
     } catch (e) {
       return null;
     }
+  }
+
+  /**
+   * 自动同步到云端（带节流）
+   * 避免频繁调用，5秒内只同步一次
+   */
+  static autoSyncToCloud() {
+    // 检查用户是否已登录
+    const userInfo = this.getUserInfo();
+    if (!userInfo || !userInfo.isLogin) {
+      return; // 未登录，不同步
+    }
+
+    // 节流：5秒内只同步一次
+    const now = Date.now();
+    const lastAutoSync = wx.getStorageSync('lastAutoSyncTime') || 0;
+    if (now - lastAutoSync < 5000) {
+      console.log('同步节流中，跳过本次同步');
+      return;
+    }
+
+    // 记录本次同步时间
+    wx.setStorageSync('lastAutoSyncTime', now);
+
+    // 异步执行同步，不阻塞主流程
+    setTimeout(() => {
+      this.syncWithCloud().then(result => {
+        if (result.success) {
+          console.log('自动同步成功');
+        } else {
+          console.error('自动同步失败:', result.error);
+        }
+      }).catch(err => {
+        console.error('自动同步异常:', err);
+      });
+    }, 100);
   }
 }
 

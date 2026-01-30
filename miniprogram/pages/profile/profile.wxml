@@ -145,15 +145,6 @@
     <t-cell-group theme="card">
       <t-cell
         wx:if="{{userInfo.isLogin}}"
-        title="数据同步"
-        note="同步到云端"
-        arrow
-        left-icon="☁️"
-        hover
-        bindtap="handleSync"
-      />
-      <t-cell
-        wx:if="{{userInfo.isLogin}}"
         title="退出登录"
         arrow
         left-icon="⎋"

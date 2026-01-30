@@ -44,6 +44,9 @@ Page({
     // 每次显示页面时重新加载
     this.loadUserInfo();
     this.loadUserData();
+
+    // 触发一次自动同步
+    StorageManager.autoSyncToCloud();
   },
 
   // 加载用户信息
@@ -450,52 +453,6 @@ Page({
       }
     } catch (err) {
       console.error('自动同步失败:', err);
-    }
-  },
-
-  // 手动同步数据
-  async handleSync() {
-    const userInfo = StorageManager.getUserInfo();
-    if (!userInfo.isLogin) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      });
-      return;
-    }
-
-    wx.showLoading({
-      title: '同步中...',
-      mask: true
-    });
-
-    try {
-      const result = await StorageManager.syncWithCloud();
-      wx.hideLoading();
-
-      if (result.success) {
-        // 刷新页面数据
-        this.loadUserData();
-
-        const lastSyncTime = StorageManager.getLastSyncTime();
-        const timeStr = lastSyncTime ? new Date(lastSyncTime).toLocaleString('zh-CN') : '';
-
-        wx.showModal({
-          title: '同步成功',
-          content: `数据已成功同步\n\n最后同步时间：\n${timeStr}`,
-          showCancel: false,
-          confirmText: '知道了'
-        });
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (err) {
-      wx.hideLoading();
-      wx.showModal({
-        title: '同步失败',
-        content: err.message || '请检查网络连接',
-        showCancel: false
-      });
     }
   },
 
