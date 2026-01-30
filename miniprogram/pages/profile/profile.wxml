@@ -134,20 +134,6 @@
     <text class="section-title">其他</text>
     <t-cell-group theme="card">
       <t-cell
-        title="提醒设置"
-        arrow
-        left-icon="🔔"
-        hover
-        bindtap="editNotifications"
-      />
-      <t-cell
-        title="数据导出"
-        arrow
-        left-icon="📊"
-        hover
-        bindtap="exportData"
-      />
-      <t-cell
         title="帮助与反馈"
         arrow
         left-icon="❓"

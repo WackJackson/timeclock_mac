@@ -313,42 +313,28 @@ Page({
     });
   },
 
-  // 提醒设置
-  editNotifications() {
-    wx.showToast({
-      title: '提醒设置功能开发中',
-      icon: 'none'
-    });
-  },
-
-  // 导出数据
-  exportData() {
-    wx.showModal({
-      title: '导出数据',
-      content: '是否导出所有工作记录数据？',
-      confirmText: '导出',
-      success: (res) => {
-        if (res.confirm) {
-          wx.showLoading({
-            title: '导出中...'
-          });
-          setTimeout(() => {
-            wx.hideLoading();
-            wx.showToast({
-              title: '导出成功',
-              icon: 'success'
-            });
-          }, 1500);
-        }
-      }
-    });
-  },
-
   // 帮助与反馈
   showHelp() {
-    wx.showToast({
-      title: '帮助功能开发中',
-      icon: 'none'
+    wx.showModal({
+      title: '🦹🏿‍♂️ 作者信息',
+      content: '作者微信号：WackJackson\n\n欢迎添加微信交流反馈！',
+      showCancel: true,
+      cancelText: '知道了',
+      confirmText: '复制微信号',
+      success: (res) => {
+        if (res.confirm) {
+          // 复制微信号到剪贴板
+          wx.setClipboardData({
+            data: 'WackJackson',
+            success: () => {
+              wx.showToast({
+                title: '微信号已复制',
+                icon: 'success'
+              });
+            }
+          });
+        }
+      }
     });
   },
 
