@@ -10,6 +10,7 @@ Page({
     worktime: '--',
     dimensionTab: 'day',
     totalHours: 0,
+    chartStyle: 'background: conic-gradient(#e5e5e5 0deg 360deg);',
     modeStats: {
       normal: {
         hours: 0,
@@ -196,8 +197,12 @@ Page({
     const burnoutPercent = total > 0 ? Math.round((burnout / total) * 100) : 0;
     const slackPercent = total > 0 ? Math.round((slack / total) * 100) : 0;
 
+    // 生成饼图渐变样式
+    const chartStyle = this.generateChartStyle(normalPercent, burnoutPercent, slackPercent);
+
     this.setData({
       totalHours: totalHours,
+      chartStyle: chartStyle,
       modeStats: {
         normal: {
           hours: normalHours,
@@ -216,6 +221,44 @@ Page({
         }
       }
     });
+  },
+
+  // 生成环形图样式
+  generateChartStyle(normalPercent, burnoutPercent, slackPercent) {
+    // 如果所有值都是0，显示灰色圆环
+    if (normalPercent === 0 && burnoutPercent === 0 && slackPercent === 0) {
+      return 'background: conic-gradient(#e5e5e5 0deg 360deg);';
+    }
+
+    // 计算角度（百分比 * 3.6 = 角度）
+    const normalDeg = normalPercent * 3.6;
+    const burnoutDeg = burnoutPercent * 3.6;
+    const slackDeg = slackPercent * 3.6;
+
+    // 计算累积角度
+    const normalEnd = normalDeg;
+    const burnoutEnd = normalEnd + burnoutDeg;
+    const slackEnd = burnoutEnd + slackDeg;
+
+    // 生成conic-gradient
+    let gradient = 'background: conic-gradient(';
+
+    if (normalPercent > 0) {
+      gradient += `#0052d9 0deg ${normalEnd}deg`;
+      if (burnoutPercent > 0 || slackPercent > 0) gradient += ', ';
+    }
+
+    if (burnoutPercent > 0) {
+      gradient += `#ed7b2f ${normalEnd}deg ${burnoutEnd}deg`;
+      if (slackPercent > 0) gradient += ', ';
+    }
+
+    if (slackPercent > 0) {
+      gradient += `#00a870 ${burnoutEnd}deg ${slackEnd}deg`;
+    }
+
+    gradient += ');';
+    return gradient;
   },
 
   // 获取年度收入统计

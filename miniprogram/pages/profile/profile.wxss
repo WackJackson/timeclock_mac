@@ -138,11 +138,6 @@
   width: 224rpx;
   height: 224rpx;
   border-radius: 50%;
-  background: conic-gradient(
-    #0052d9 0deg 216deg,
-    #ed7b2f 216deg 306deg,
-    #00a870 306deg 360deg
-  );
   display: flex;
   align-items: center;
   justify-content: center;

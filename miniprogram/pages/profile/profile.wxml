@@ -55,7 +55,7 @@
       <!-- 环形图和图例 -->
       <view class="stats-content">
         <view class="chart-container">
-          <view class="donut-chart">
+          <view class="donut-chart" style="{{chartStyle}}">
             <view class="donut-center">
               <text class="donut-value">{{totalHours}}h</text>
               <text class="donut-label">总时长</text>
