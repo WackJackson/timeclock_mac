@@ -163,8 +163,10 @@ Page({
     const config = StorageManager.getUserConfig();
     if (!config) return;
 
-    // 获取时薪（用于计算小时数）
-    const hourlyRate = parseFloat(config.hourlyRate || 0);
+    // 导入 SalaryCalculator 来计算秒薪
+    const SalaryCalculator = require('../../utils/salary-calculator.js');
+    const salaryData = SalaryCalculator.getCurrentMonthSalary(config);
+    const secondSalary = salaryData.secondSalary;
 
     let earnings;
     if (dimension === 'day') {
@@ -183,11 +185,11 @@ Page({
     const burnout = earnings.burnout || 0;
     const slack = earnings.slack || 0;
 
-    // 计算小时数
-    const totalHours = hourlyRate > 0 ? (total / hourlyRate).toFixed(1) : 0;
-    const normalHours = hourlyRate > 0 ? (normal / hourlyRate).toFixed(1) : 0;
-    const burnoutHours = hourlyRate > 0 ? (burnout / hourlyRate).toFixed(1) : 0;
-    const slackHours = hourlyRate > 0 ? (slack / hourlyRate).toFixed(1) : 0;
+    // 计算小时数（金额 / 秒薪 / 3600）
+    const totalHours = secondSalary > 0 ? (total / secondSalary / 3600).toFixed(1) : 0;
+    const normalHours = secondSalary > 0 ? (normal / secondSalary / 3600).toFixed(1) : 0;
+    const burnoutHours = secondSalary > 0 ? (burnout / secondSalary / 3600).toFixed(1) : 0;
+    const slackHours = secondSalary > 0 ? (slack / secondSalary / 3600).toFixed(1) : 0;
 
     // 计算百分比
     const normalPercent = total > 0 ? Math.round((normal / total) * 100) : 0;
