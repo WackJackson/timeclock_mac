@@ -2,18 +2,21 @@
   <!-- 作者头像 -->
   <view class="author-header">
     <view class="author-avatar">{{authorEmoji}}</view>
-    <text class="author-title">作者</text>
+    <text class="author-title">WackJackson</text>
   </view>
 
   <!-- 微信信息卡片 -->
   <view class="info-card">
-    <view class="info-label">微信号</view>
-    <view class="wechat-row">
-      <text class="wechat-id">{{wechatId}}</text>
-      <view class="copy-btn" bindtap="copyWechatId">
-        <text class="copy-icon">📋</text>
-        <text class="copy-text">复制</text>
+    <view class="info-row">
+      <view class="info-label-inline">
+        <text class="label-icon">💬</text>
+        <text class="label-text">微信号</text>
       </view>
+      <view class="wechat-id">{{wechatId}}</view>
+    </view>
+    <view class="copy-btn" bindtap="copyWechatId">
+      <text class="copy-icon">📋</text>
+      <text class="copy-text">复制微信号</text>
     </view>
   </view>
 

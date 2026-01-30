@@ -49,44 +49,58 @@
 .info-card {
   width: 100%;
   background: white;
-  border-radius: 32rpx;
-  padding: 48rpx;
+  border-radius: 24rpx;
+  padding: 32rpx;
   box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.15);
   margin-bottom: 48rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
 }
 
-.info-label {
-  font-size: 24rpx;
-  color: #999;
-  margin-bottom: 16rpx;
-}
-
-.wechat-row {
+.info-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+.info-label-inline {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.label-icon {
+  font-size: 24rpx;
+}
+
+.label-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
 .wechat-id {
-  font-size: 48rpx;
+  font-size: 32rpx;
   font-weight: bold;
   color: #242424;
-  letter-spacing: 2rpx;
+  letter-spacing: 1rpx;
 }
 
 .copy-btn {
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12rpx;
-  padding: 16rpx 32rpx;
+  padding: 24rpx;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 48rpx;
+  border-radius: 16rpx;
   box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
   transition: all 0.3s ease;
 }
 
 .copy-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
   box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.3);
 }
 
