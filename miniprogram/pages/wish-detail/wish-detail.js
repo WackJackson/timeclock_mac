@@ -105,8 +105,8 @@ Page({
     // 计算统计数据
     const stats = this.calculateStats(wish, records);
 
-    // 格式化资金记录
-    const formattedRecords = this.formatRecords(records);
+    // 格式化资金记录（传入目标金额以限制显示）
+    const formattedRecords = this.formatRecords(records, target);
 
     // 更新数据
     this.setData({
@@ -174,22 +174,32 @@ Page({
     const today = StorageManager.getTodayKey();
     const savedDays = this.getDaysBetween(createdDate, today);
 
+    // 获取当前金额和目标金额
+    const current = parseFloat(wish.currentAmount || 0);
+    const target = parseFloat(wish.targetAmount || 0);
+
+    // 计算总金额（限制不超过目标金额）
+    let totalAmount = 0;
+    records.forEach(record => {
+      const amount = parseFloat(record.amount || 0);
+      totalAmount += amount;
+    });
+    // 如果超过目标，使用当前金额（已被限制的）
+    if (totalAmount > target && target > 0) {
+      totalAmount = current;
+    }
+
     // 计算日均金额
-    const totalAmount = records.reduce((sum, record) => {
-      return sum + parseFloat(record.amount || 0);
-    }, 0);
     const dailyAverage = savedDays > 0 ? totalAmount / savedDays : 0;
 
     // 计算预计完成天数
-    const current = parseFloat(wish.currentAmount || 0);
-    const target = parseFloat(wish.targetAmount || 0);
     const remaining = target - current;
     const estimatedDays = dailyAverage > 0 ? Math.ceil(remaining / dailyAverage) : 0;
 
-    // 计算所需总时长（分钟）
+    // 计算所需总时长（分钟）- 基于当前已达成金额
     const userConfig = StorageManager.getUserConfig();
     const hourlyRate = userConfig ? parseFloat(userConfig.hourlyRate || 0) : 0;
-    const totalMinutes = hourlyRate > 0 ? Math.round((totalAmount / hourlyRate) * 60) : 0;
+    const totalMinutes = hourlyRate > 0 ? Math.round((current / hourlyRate) * 60) : 0;
 
     return {
       savedDays: savedDays,
@@ -199,7 +209,7 @@ Page({
   },
 
   // 格式化资金记录
-  formatRecords(records) {
+  formatRecords(records, targetAmount) {
     if (records.length === 0) {
       return [];
     }
@@ -215,14 +225,28 @@ Page({
       slack: { total: 0, minutes: 0 }
     };
 
+    // 计算总金额，但不超过目标金额
+    let accumulatedTotal = 0;
+    const target = parseFloat(targetAmount || 0);
+
     records.forEach(record => {
       const mode = record.mode || 'normal';
       const amount = parseFloat(record.amount || 0);
+
+      // 如果累计金额已经达到目标，不再累加
+      if (accumulatedTotal >= target && target > 0) {
+        return;
+      }
+
+      // 计算本次实际应该累加的金额（不超过目标）
+      const actualAmount = target > 0 ? Math.min(amount, target - accumulatedTotal) : amount;
+      accumulatedTotal += actualAmount;
+
       if (modeStats[mode]) {
-        modeStats[mode].total += amount;
+        modeStats[mode].total += actualAmount;
         // 计算时长（分钟） = 金额 / 时薪 * 60
         if (hourlyRate > 0) {
-          modeStats[mode].minutes += (amount / hourlyRate) * 60;
+          modeStats[mode].minutes += (actualAmount / hourlyRate) * 60;
         }
       }
     });

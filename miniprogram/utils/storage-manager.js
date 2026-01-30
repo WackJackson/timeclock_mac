@@ -222,7 +222,14 @@ class StorageManager {
           // 查找下一个等待中的愿望并自动激活
           // 按创建时间排序，找到第一个未完成的愿望
           const waitingWishes = wishes
-            .filter(w => w.status !== 'completed' && w.progress < 100 && w.id !== wishId)
+            .filter(w => {
+              // 排除当前完成的愿望
+              if (w.id === wishId) return false;
+              // 排除已完成的愿望（状态为completed或进度>=100）
+              if (w.status === 'completed' || w.progress >= 100) return false;
+              // 包含等待中的愿望
+              return true;
+            })
             .sort((a, b) => {
               const dateA = a.createdDate || '0000-00-00';
               const dateB = b.createdDate || '0000-00-00';
