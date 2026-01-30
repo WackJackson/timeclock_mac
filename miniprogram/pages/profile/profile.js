@@ -300,36 +300,8 @@ Page({
 
   // 编辑月薪
   editSalary() {
-    const config = StorageManager.getUserConfig();
-    const currentSalary = config ? config.salary : '15000';
-
-    wx.showModal({
-      title: '月薪设置',
-      editable: true,
-      placeholderText: '请输入月薪',
-      content: currentSalary,
-      success: (res) => {
-        if (res.confirm && res.content) {
-          const newSalary = parseFloat(res.content);
-          if (!isNaN(newSalary) && newSalary > 0) {
-            const updatedConfig = {
-              ...config,
-              salary: res.content
-            };
-            StorageManager.saveUserConfig(updatedConfig);
-            this.loadUserData();
-            wx.showToast({
-              title: '修改成功',
-              icon: 'success'
-            });
-          } else {
-            wx.showToast({
-              title: '请输入有效金额',
-              icon: 'none'
-            });
-          }
-        }
-      }
+    wx.navigateTo({
+      url: '/pages/setup/setup?edit=true&step=1'
     });
   },
 
