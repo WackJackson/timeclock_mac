@@ -16,16 +16,14 @@ exports.main = async (event, context) => {
     // 获取用户openid
     const openid = wxContext.OPENID;
 
-    // 查询用户是否已存在
-    const userQuery = await db.collection('users').where({
-      _openid: openid
-    }).get();
+    // 查询当前用户的记录（云开发会自动按_openid过滤）
+    const userQuery = await db.collection('users').limit(1).get();
 
     const now = new Date();
 
     if (userQuery.data.length === 0) {
       // 新用户，创建记录
-      await db.collection('users').add({
+      const addResult = await db.collection('users').add({
         data: {
           nickName,
           avatarUrl,
@@ -40,13 +38,14 @@ exports.main = async (event, context) => {
         openid,
         nickName,
         avatarUrl,
+        userId: addResult._id,
         message: '注册成功'
       };
     } else {
       // 老用户，更新信息
-      await db.collection('users').where({
-        _openid: openid
-      }).update({
+      const existingUser = userQuery.data[0];
+
+      await db.collection('users').doc(existingUser._id).update({
         data: {
           nickName,
           avatarUrl,
@@ -60,6 +59,7 @@ exports.main = async (event, context) => {
         openid,
         nickName,
         avatarUrl,
+        userId: existingUser._id,
         message: '登录成功'
       };
     }
@@ -67,7 +67,8 @@ exports.main = async (event, context) => {
     console.error('登录失败:', err);
     return {
       success: false,
-      error: err.message
+      error: err.message,
+      errorDetail: err
     };
   }
 };
