@@ -161,7 +161,9 @@ Page({
 
   // 计算统计数据
   calculateStats(wish, records) {
-    if (records.length === 0) {
+    // 获取用户配置和薪资数据
+    const userConfig = StorageManager.getUserConfig();
+    if (!userConfig) {
       return {
         savedDays: 0,
         estimatedDays: 0,
@@ -169,41 +171,50 @@ Page({
       };
     }
 
-    // 计算已攒天数（从创建日期到现在）
+    // 导入 SalaryCalculator
+    const SalaryCalculator = require('../../utils/salary-calculator.js');
+    const salaryData = SalaryCalculator.getCurrentMonthSalary(userConfig);
+
+    // 获取秒薪和每日工作秒数
+    const secondSalary = salaryData.secondSalary;
+    const dailyWorkSeconds = salaryData.dailyWorkSeconds;
+
+    // 计算已攒天数（从创建日期到今天，包含今天）
     const createdDate = wish.createdDate;
     const today = StorageManager.getTodayKey();
-    const savedDays = this.getDaysBetween(createdDate, today);
+    let savedDays = 0;
+
+    if (createdDate) {
+      // 计算日期差，然后加1（因为今天也算一天）
+      const daysDiff = this.getDaysBetween(createdDate, today);
+      savedDays = daysDiff + 1;
+    }
 
     // 获取当前金额和目标金额
     const current = parseFloat(wish.currentAmount || 0);
     const target = parseFloat(wish.targetAmount || 0);
 
-    // 计算总金额（限制不超过目标金额）
-    let totalAmount = 0;
-    records.forEach(record => {
-      const amount = parseFloat(record.amount || 0);
-      totalAmount += amount;
-    });
-    // 如果超过目标，使用当前金额（已被限制的）
-    if (totalAmount > target && target > 0) {
-      totalAmount = current;
-    }
-
-    // 计算日均金额
-    const dailyAverage = savedDays > 0 ? totalAmount / savedDays : 0;
+    // 计算所需总时长（分钟）- 基于目标金额
+    // 目标金额 / 秒薪 = 所需工作秒数，再除以60得到分钟数
+    const totalMinutes = secondSalary > 0 ? Math.round((target / secondSalary) / 60) : 0;
 
     // 计算预计完成天数
+    // 日薪 = 秒薪 × 每日工作秒数
+    const dailySalary = secondSalary * dailyWorkSeconds;
     const remaining = target - current;
-    const estimatedDays = dailyAverage > 0 ? Math.ceil(remaining / dailyAverage) : 0;
 
-    // 计算所需总时长（分钟）- 基于当前已达成金额
-    const userConfig = StorageManager.getUserConfig();
-    const hourlyRate = userConfig ? parseFloat(userConfig.hourlyRate || 0) : 0;
-    const totalMinutes = hourlyRate > 0 ? Math.round((current / hourlyRate) * 60) : 0;
+    let estimatedDays = 0;
+    if (dailySalary > 0 && remaining > 0) {
+      // 计算还需要多少个完整工作日
+      const daysNeeded = Math.ceil(remaining / dailySalary);
+      // 因为今天已经算第一天了，所以预计完成是 daysNeeded - 1 天后
+      // 例如：需要15天，今天是第1天，所以14天后完成
+      estimatedDays = daysNeeded > 0 ? daysNeeded - 1 : 0;
+    }
 
     return {
       savedDays: savedDays,
-      estimatedDays: estimatedDays > 0 ? estimatedDays : 0,
+      estimatedDays: estimatedDays,
       totalMinutes: totalMinutes
     };
   },
@@ -296,12 +307,17 @@ Page({
     return result;
   },
 
-  // 计算两个日期之间的天数
+  // 计算两个日期之间的天数差（不包含结束日期）
   getDaysBetween(dateStr1, dateStr2) {
     const date1 = this.parseDate(dateStr1);
     const date2 = this.parseDate(dateStr2);
-    const diffTime = Math.abs(date2 - date1);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // 设置为当天的00:00:00，避免时间部分影响计算
+    date1.setHours(0, 0, 0, 0);
+    date2.setHours(0, 0, 0, 0);
+
+    const diffTime = date2 - date1;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   },
 
