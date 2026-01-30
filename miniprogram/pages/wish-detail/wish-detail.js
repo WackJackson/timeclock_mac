@@ -198,18 +198,21 @@ Page({
     // 目标金额 / 秒薪 = 所需工作秒数，再除以60得到分钟数
     const totalMinutes = secondSalary > 0 ? Math.round((target / secondSalary) / 60) : 0;
 
-    // 计算预计完成天数
+    // 计算预计完成天数（考虑休息日）
     // 日薪 = 秒薪 × 每日工作秒数
     const dailySalary = secondSalary * dailyWorkSeconds;
     const remaining = target - current;
 
     let estimatedDays = 0;
     if (dailySalary > 0 && remaining > 0) {
-      // 计算还需要多少个完整工作日
-      const daysNeeded = Math.ceil(remaining / dailySalary);
-      // 因为今天已经算第一天了，所以预计完成是 daysNeeded - 1 天后
-      // 例如：需要15天，今天是第1天，所以14天后完成
-      estimatedDays = daysNeeded > 0 ? daysNeeded - 1 : 0;
+      // 计算还需要多少个工作日
+      const workDaysNeeded = Math.ceil(remaining / dailySalary);
+
+      // 计算这些工作日对应多少个日历天（包含休息日）
+      const calendarDaysNeeded = this.calculateCalendarDays(workDaysNeeded, userConfig.workdays);
+
+      // 因为今天已经算第一天了，所以预计完成是 calendarDaysNeeded - 1 天后
+      estimatedDays = calendarDaysNeeded > 0 ? calendarDaysNeeded - 1 : 0;
     }
 
     return {
@@ -217,6 +220,36 @@ Page({
       estimatedDays: estimatedDays,
       totalMinutes: totalMinutes
     };
+  },
+
+  // 计算N个工作日需要多少个日历天（从明天开始算）
+  calculateCalendarDays(workDaysNeeded, workdays) {
+    if (workDaysNeeded <= 0) return 0;
+
+    const today = new Date();
+    let calendarDays = 0;
+    let workDaysFound = 0;
+    let currentDate = new Date(today);
+
+    // 从今天开始往后数，找到第N个工作日
+    while (workDaysFound < workDaysNeeded) {
+      const dayOfWeek = currentDate.getDay(); // 0=周日, 1=周一, ..., 6=周六
+
+      // 检查当天是否为工作日
+      if (workdays.includes(dayOfWeek)) {
+        workDaysFound++;
+      }
+
+      calendarDays++;
+
+      // 移到下一天
+      currentDate.setDate(currentDate.getDate() + 1);
+
+      // 防止无限循环（如果workdays为空）
+      if (calendarDays > 1000) break;
+    }
+
+    return calendarDays;
   },
 
   // 格式化资金记录
