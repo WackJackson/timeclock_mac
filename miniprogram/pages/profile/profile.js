@@ -54,27 +54,66 @@ Page({
 
   // 处理登录
   handleLogin() {
+    wx.showLoading({
+      title: '登录中...',
+      mask: true
+    });
+
+    // 获取用户信息
     wx.getUserProfile({
       desc: '用于完善用户资料',
-      success: (res) => {
-        const userInfo = {
-          isLogin: true,
-          nickName: res.userInfo.nickName,
-          avatarUrl: res.userInfo.avatarUrl
-        };
+      success: async (res) => {
+        const { nickName, avatarUrl } = res.userInfo;
 
-        StorageManager.saveUserInfo(userInfo);
-        this.setData({ userInfo });
+        try {
+          // 调用云函数进行登录
+          const cloudResult = await wx.cloud.callFunction({
+            name: 'login',
+            data: {
+              nickName,
+              avatarUrl
+            }
+          });
 
-        wx.showToast({
-          title: '登录成功',
-          icon: 'success'
-        });
+          wx.hideLoading();
+
+          if (cloudResult.result.success) {
+            const userInfo = {
+              isLogin: true,
+              nickName,
+              avatarUrl,
+              openid: cloudResult.result.openid
+            };
+
+            StorageManager.saveUserInfo(userInfo);
+            this.setData({ userInfo });
+
+            // 保存到全局数据
+            const app = getApp();
+            app.globalData.openid = cloudResult.result.openid;
+
+            wx.showToast({
+              title: cloudResult.result.message,
+              icon: 'success'
+            });
+          } else {
+            throw new Error(cloudResult.result.error || '登录失败');
+          }
+        } catch (err) {
+          wx.hideLoading();
+          console.error('登录失败:', err);
+          wx.showModal({
+            title: '登录失败',
+            content: err.message || '请检查网络连接和云开发配置',
+            showCancel: false
+          });
+        }
       },
       fail: (err) => {
+        wx.hideLoading();
         console.error('获取用户信息失败:', err);
         wx.showToast({
-          title: '登录失败',
+          title: '取消登录',
           icon: 'none'
         });
       }
