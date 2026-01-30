@@ -22,7 +22,8 @@ Page({
           startTime: '14:00',
           endTime: '18:00'
         }
-      ]
+      ],
+      firstWorkDate: '' // 首次工作日期（YYYY-MM格式）
     },
     weekdays: [
       { label: '一', value: 1, selected: true },
@@ -62,8 +63,20 @@ Page({
           selected: config.workdays.includes(day.value)
         }));
 
+        // 加载首次工作日期
+        const firstWorkDate = StorageManager.getFirstWorkDate();
+        // 如果是完整日期格式（YYYY-MM-DD），提取年月
+        let firstWorkYearMonth = '';
+        if (firstWorkDate) {
+          const parts = firstWorkDate.split('-');
+          firstWorkYearMonth = `${parts[0]}-${parts[1]}`;
+        }
+
         this.setData({
-          formData: config,
+          formData: {
+            ...config,
+            firstWorkDate: firstWorkYearMonth
+          },
           weekdays: weekdays,
           isEditMode: true,
           step: targetStep // 跳转到指定步骤
@@ -97,6 +110,13 @@ Page({
     this.setData({
       weekdays,
       'formData.workdays': selectedDays
+    });
+  },
+
+  // 首次工作日期选择
+  onFirstWorkDateChange(e) {
+    this.setData({
+      'formData.firstWorkDate': e.detail.value
     });
   },
 
@@ -307,6 +327,16 @@ Page({
       }
     }
 
+    if (step === 4) {
+      if (!formData.firstWorkDate) {
+        wx.showToast({
+          title: '请选择首次工作日期',
+          icon: 'none'
+        });
+        return false;
+      }
+    }
+
     return true;
   },
 
@@ -361,7 +391,25 @@ Page({
       return;
     }
 
-    // 保存配置
+    // 如果是第4步（工龄设置），只保存首次工作日期
+    if (this.data.step === 4) {
+      const firstWorkDate = this.data.formData.firstWorkDate;
+      // 转换为完整日期格式（补充01作为日）
+      const fullDate = `${firstWorkDate}-01`;
+      StorageManager.setFirstWorkDate(fullDate);
+
+      wx.showToast({
+        title: '保存成功',
+        icon: 'success'
+      });
+
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1500);
+      return;
+    }
+
+    // 其他步骤保存完整配置
     const success = StorageManager.saveUserConfig(this.data.formData);
 
     if (success) {

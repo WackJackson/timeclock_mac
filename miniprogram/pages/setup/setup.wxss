@@ -307,3 +307,48 @@
   padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
   background: linear-gradient(to top, white 80%, transparent);
 }
+
+/* 日期选择器 */
+.date-picker-wrapper {
+  margin-bottom: 16rpx;
+}
+
+.date-picker-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  background: #f5f5f5;
+  border-radius: 24rpx;
+  border: 4rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.date-picker-display:active {
+  border-color: #0052d9;
+  background: white;
+}
+
+.date-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.date-value {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #242424;
+}
+
+.date-value .placeholder {
+  color: #999;
+  font-weight: normal;
+}
+
+.date-value .arrow {
+  font-size: 40rpx;
+  color: #999;
+}

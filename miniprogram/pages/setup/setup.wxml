@@ -126,6 +126,34 @@
         </view>
       </view>
     </view>
+
+    <!-- 步骤4: 工龄设置 -->
+    <view class="form-section" wx:if="{{step === 4}}">
+      <view class="form-card">
+        <view class="form-label">
+          <view class="label-icon">👔</view>
+          <text class="label-text">工龄设置</text>
+        </view>
+        <view class="date-picker-wrapper">
+          <picker
+            mode="date"
+            value="{{formData.firstWorkDate}}"
+            fields="month"
+            bindchange="onFirstWorkDateChange"
+          >
+            <view class="date-picker-display">
+              <text class="date-label">首次工作时间</text>
+              <view class="date-value">
+                <text wx:if="{{formData.firstWorkDate}}">{{formData.firstWorkDate}}</text>
+                <text wx:else class="placeholder">请选择年月</text>
+                <text class="arrow">›</text>
+              </view>
+            </view>
+          </picker>
+        </view>
+        <text class="form-hint">选择您开始工作的年月，用于计算工龄</text>
+      </view>
+    </view>
   </scroll-view>
 
   <!-- 底部按钮 -->
