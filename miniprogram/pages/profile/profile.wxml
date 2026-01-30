@@ -118,6 +118,14 @@
         hover
         bindtap="editWorktime"
       />
+      <t-cell
+        title="工龄设置"
+        note="{{workYears}}"
+        arrow
+        left-icon="👔"
+        hover
+        bindtap="editWorkTenure"
+      />
     </t-cell-group>
   </view>
 

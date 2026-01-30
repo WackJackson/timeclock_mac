@@ -2,7 +2,7 @@ const { StorageManager } = require('../../utils/storage-manager.js');
 
 Page({
   data: {
-    workYears: '0天',
+    workYears: '0年',
     recordDays: 0,
     monthlySalary: '0',
     totalEarned: '0',
@@ -86,7 +86,7 @@ Page({
   calculateWorkTenure() {
     const firstWorkDate = StorageManager.getFirstWorkDate();
     if (!firstWorkDate) {
-      this.setData({ workYears: '0天' });
+      this.setData({ workYears: '0年' });
       return;
     }
 
@@ -95,22 +95,13 @@ Page({
     const diffTime = Math.abs(now - start);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) {
-      this.setData({ workYears: '今天' });
-    } else if (diffDays < 30) {
-      this.setData({ workYears: `${diffDays}天` });
-    } else if (diffDays < 365) {
-      const months = Math.floor(diffDays / 30);
-      const days = diffDays % 30;
-      this.setData({
-        workYears: days > 0 ? `${months}个月${days}天` : `${months}个月`
-      });
+    // 计算年数（365天为一年，四舍五入）
+    const years = Math.round(diffDays / 365);
+
+    if (years === 0) {
+      this.setData({ workYears: '0年' });
     } else {
-      const years = Math.floor(diffDays / 365);
-      const months = Math.floor((diffDays % 365) / 30);
-      this.setData({
-        workYears: months > 0 ? `${years}年${months}个月` : `${years}年`
-      });
+      this.setData({ workYears: `${years}年` });
     }
   },
 
@@ -316,6 +307,64 @@ Page({
   editWorktime() {
     wx.navigateTo({
       url: '/pages/setup/setup?edit=true&step=3'
+    });
+  },
+
+  // 编辑工龄
+  editWorkTenure() {
+    const firstWorkDate = StorageManager.getFirstWorkDate();
+    const currentDate = firstWorkDate || StorageManager.getTodayKey();
+
+    wx.showModal({
+      title: '工龄设置',
+      content: `当前首次工作日期：${currentDate}\n\n请输入新的首次工作日期（格式：YYYY-MM-DD）`,
+      editable: true,
+      placeholderText: 'YYYY-MM-DD',
+      success: (res) => {
+        if (res.confirm && res.content) {
+          // 验证日期格式
+          const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+          if (!datePattern.test(res.content)) {
+            wx.showToast({
+              title: '日期格式错误，请使用YYYY-MM-DD格式',
+              icon: 'none',
+              duration: 2000
+            });
+            return;
+          }
+
+          // 验证日期是否有效
+          const inputDate = new Date(res.content);
+          if (isNaN(inputDate.getTime())) {
+            wx.showToast({
+              title: '无效的日期',
+              icon: 'none'
+            });
+            return;
+          }
+
+          // 验证日期不能晚于今天
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          if (inputDate > today) {
+            wx.showToast({
+              title: '首次工作日期不能晚于今天',
+              icon: 'none',
+              duration: 2000
+            });
+            return;
+          }
+
+          // 保存新的首次工作日期
+          StorageManager.setFirstWorkDate(res.content);
+          this.calculateWorkTenure();
+
+          wx.showToast({
+            title: '设置成功',
+            icon: 'success'
+          });
+        }
+      }
     });
   },
 
