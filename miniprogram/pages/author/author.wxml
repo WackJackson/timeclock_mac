@@ -7,16 +7,16 @@
 
   <!-- 微信信息卡片 -->
   <view class="info-card">
-    <view class="info-row">
-      <view class="info-label-inline">
-        <text class="label-icon">💬</text>
-        <text class="label-text">微信号</text>
-      </view>
-      <view class="wechat-id">{{wechatId}}</view>
+    <view class="card-label">
+      <text class="label-icon">💬</text>
+      <text class="label-text">微信号</text>
     </view>
-    <view class="copy-btn" bindtap="copyWechatId">
-      <text class="copy-icon">📋</text>
-      <text class="copy-text">复制微信号</text>
+    <view class="wechat-row">
+      <text class="wechat-id">{{wechatId}}</text>
+      <view class="copy-btn" bindtap="copyWechatId">
+        <text class="copy-icon">📋</text>
+        <text class="copy-text">复制</text>
+      </view>
     </view>
   </view>
 

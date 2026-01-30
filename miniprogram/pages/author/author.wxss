@@ -53,21 +53,13 @@
   padding: 32rpx;
   box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.15);
   margin-bottom: 48rpx;
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
 }
 
-.info-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.info-label-inline {
+.card-label {
   display: flex;
   align-items: center;
   gap: 8rpx;
+  margin-bottom: 16rpx;
 }
 
 .label-icon {
@@ -79,7 +71,15 @@
   color: #999;
 }
 
+.wechat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
 .wechat-id {
+  flex: 1;
   font-size: 32rpx;
   font-weight: bold;
   color: #242424;
@@ -87,29 +87,28 @@
 }
 
 .copy-btn {
-  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12rpx;
-  padding: 24rpx;
+  gap: 8rpx;
+  padding: 12rpx 24rpx;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16rpx;
+  border-radius: 48rpx;
   box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .copy-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.95);
   box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.3);
 }
 
 .copy-icon {
-  font-size: 28rpx;
+  font-size: 24rpx;
 }
 
 .copy-text {
-  font-size: 28rpx;
+  font-size: 24rpx;
   font-weight: 500;
   color: white;
 }
