@@ -96,9 +96,9 @@ class CountdownCalculator {
    * @returns {string} 倒计时文本
    */
   static getTimeToHoliday(now = new Date()) {
-    // 2026年法定节假日（简化版）
+    // 2026年法定节假日
     const holidays = [
-      { name: '春节', date: new Date(2026, 0, 17) },
+      { name: '春节', date: new Date(2026, 1, 17) }, // 2026年2月17日（农历正月初一）
       { name: '清明节', date: new Date(2026, 3, 5) },
       { name: '劳动节', date: new Date(2026, 4, 1) },
       { name: '端午节', date: new Date(2026, 5, 19) },
