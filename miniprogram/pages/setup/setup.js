@@ -187,14 +187,46 @@ Page({
     return hour * 60 + minute;
   },
 
+  // 分钟数转时间字符串
+  minutesToTime(minutes) {
+    // 处理超过24小时的情况
+    const totalMinutes = minutes % 1440; // 1440 = 24 * 60
+    const hour = Math.floor(totalMinutes / 60);
+    const minute = totalMinutes % 60;
+    return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+  },
+
   // 添加时段
   addSegment() {
+    // 找到最后一个工作时段的结束时间
+    const sortedSegments = [...this.data.formData.segments].sort((a, b) => {
+      const aStart = this.timeToMinutes(a.startTime);
+      const bStart = this.timeToMinutes(b.startTime);
+      return aStart - bStart;
+    });
+
+    let newStartTime = '09:00';
+    let newEndTime = '12:00';
+
+    if (sortedSegments.length > 0) {
+      const lastSegment = sortedSegments[sortedSegments.length - 1];
+      const lastEndMinutes = this.timeToMinutes(lastSegment.endTime);
+
+      // 开始时间 = 最后结束时间 + 1小时（60分钟）
+      const newStartMinutes = lastEndMinutes + 60;
+      // 结束时间 = 开始时间 + 3小时（180分钟）
+      const newEndMinutes = newStartMinutes + 180;
+
+      newStartTime = this.minutesToTime(newStartMinutes);
+      newEndTime = this.minutesToTime(newEndMinutes);
+    }
+
     const newSegment = {
       id: this.data.nextSegmentId,
       type: 'work',
       name: '工作时段',
-      startTime: '09:00',
-      endTime: '18:00'
+      startTime: newStartTime,
+      endTime: newEndTime
     };
 
     this.setData({
