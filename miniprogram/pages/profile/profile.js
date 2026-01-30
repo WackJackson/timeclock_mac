@@ -336,14 +336,14 @@ Page({
   // 编辑工作日
   editWorkdays() {
     wx.navigateTo({
-      url: '/pages/setup/setup?edit=true'
+      url: '/pages/setup/setup?edit=true&step=2'
     });
   },
 
   // 编辑工作时段
   editWorktime() {
     wx.navigateTo({
-      url: '/pages/setup/setup?edit=true'
+      url: '/pages/setup/setup?edit=true&step=3'
     });
   },
 

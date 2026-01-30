@@ -40,6 +40,7 @@ Page({
   onLoad(options) {
     // 检查是否是编辑模式
     const isEdit = options && options.edit === 'true';
+    const targetStep = options && options.step ? parseInt(options.step) : 1;
 
     if (!isEdit) {
       // 非编辑模式：检查是否已经完成过设置
@@ -65,7 +66,7 @@ Page({
           formData: config,
           weekdays: weekdays,
           isEditMode: true,
-          step: 1 // 编辑模式也从第一步开始
+          step: targetStep // 跳转到指定步骤
         });
       }
     }
