@@ -24,31 +24,6 @@
   margin-top: 16rpx;
 }
 
-/* 编辑模式头部 */
-.edit-header {
-  padding: 24rpx 48rpx;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-
-.edit-title-row {
-  display: flex;
-  align-items: center;
-  gap: 24rpx;
-}
-
-.edit-icon {
-  font-size: 48rpx;
-  color: #242424;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.edit-title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #242424;
-}
-
 /* 进度指示器 */
 .progress-indicator {
   padding: 0 48rpx 48rpx;
