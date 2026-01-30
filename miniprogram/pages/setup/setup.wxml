@@ -11,8 +11,9 @@
       <view class="progress-bar {{step >= 1 ? 'active' : ''}}"></view>
       <view class="progress-bar {{step >= 2 ? 'active' : ''}}"></view>
       <view class="progress-bar {{step >= 3 ? 'active' : ''}}"></view>
+      <view class="progress-bar {{step >= 4 ? 'active' : ''}}"></view>
     </view>
-    <text class="progress-text">步骤 {{step}}/3</text>
+    <text class="progress-text">步骤 {{step}}/4</text>
   </view>
 
   <!-- 表单内容 -->
@@ -171,7 +172,7 @@
 
     <!-- 首次设置模式：下一步/完成设置 -->
     <t-button
-      wx:if="{{!isEditMode && step < 3}}"
+      wx:if="{{!isEditMode && step < 4}}"
       theme="primary"
       size="large"
       block
@@ -180,7 +181,7 @@
       下一步
     </t-button>
     <t-button
-      wx:if="{{!isEditMode && step === 3}}"
+      wx:if="{{!isEditMode && step === 4}}"
       theme="primary"
       size="large"
       block

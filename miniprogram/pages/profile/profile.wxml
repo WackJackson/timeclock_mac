@@ -1,10 +1,20 @@
 <view class="profile-container">
   <!-- 头部 -->
   <view class="profile-header">
-    <view class="user-info">
-      <view class="avatar">😊</view>
+    <!-- 未登录状态 -->
+    <view class="user-info" wx:if="{{!userInfo.isLogin}}">
+      <view class="avatar">👤</view>
       <view class="user-details">
-        <text class="username">打工人</text>
+        <text class="username">未登录</text>
+        <button class="login-btn" bindtap="handleLogin">点击登录</button>
+      </view>
+    </view>
+
+    <!-- 已登录状态 -->
+    <view class="user-info" wx:if="{{userInfo.isLogin}}">
+      <image class="avatar avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+      <view class="user-details">
+        <text class="username">{{userInfo.nickName}}</text>
         <text class="work-info">工龄 {{workYears}} · 已记录 {{recordDays}} 天</text>
       </view>
     </view>
@@ -133,6 +143,14 @@
   <view class="settings-section">
     <text class="section-title">其他</text>
     <t-cell-group theme="card">
+      <t-cell
+        wx:if="{{userInfo.isLogin}}"
+        title="退出登录"
+        arrow
+        left-icon="⎋"
+        hover
+        bindtap="handleLogout"
+      />
       <t-cell
         title="帮助与反馈"
         arrow

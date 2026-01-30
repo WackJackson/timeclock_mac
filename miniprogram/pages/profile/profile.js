@@ -2,6 +2,11 @@ const { StorageManager } = require('../../utils/storage-manager.js');
 
 Page({
   data: {
+    userInfo: {
+      isLogin: false,
+      nickName: '未登录',
+      avatarUrl: ''
+    },
     workYears: '0.0年',
     recordDays: 0,
     monthlySalary: '0',
@@ -31,12 +36,75 @@ Page({
   },
 
   onLoad() {
+    this.loadUserInfo();
     this.loadUserData();
   },
 
   onShow() {
     // 每次显示页面时重新加载
+    this.loadUserInfo();
     this.loadUserData();
+  },
+
+  // 加载用户信息
+  loadUserInfo() {
+    const userInfo = StorageManager.getUserInfo();
+    this.setData({ userInfo });
+  },
+
+  // 处理登录
+  handleLogin() {
+    wx.getUserProfile({
+      desc: '用于完善用户资料',
+      success: (res) => {
+        const userInfo = {
+          isLogin: true,
+          nickName: res.userInfo.nickName,
+          avatarUrl: res.userInfo.avatarUrl
+        };
+
+        StorageManager.saveUserInfo(userInfo);
+        this.setData({ userInfo });
+
+        wx.showToast({
+          title: '登录成功',
+          icon: 'success'
+        });
+      },
+      fail: (err) => {
+        console.error('获取用户信息失败:', err);
+        wx.showToast({
+          title: '登录失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  // 退出登录
+  handleLogout() {
+    wx.showModal({
+      title: '确认退出',
+      content: '退出登录后仍可使用所有功能',
+      confirmText: '退出',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          StorageManager.clearUserInfo();
+          this.setData({
+            userInfo: {
+              isLogin: false,
+              nickName: '未登录',
+              avatarUrl: ''
+            }
+          });
+          wx.showToast({
+            title: '已退出登录',
+            icon: 'success'
+          });
+        }
+      }
+    });
   },
 
   // 加载用户数据

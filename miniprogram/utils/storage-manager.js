@@ -11,7 +11,8 @@ const STORAGE_KEYS = {
   HAS_SETUP: 'hasSetup',
   CURRENT_MODE: 'currentMode',
   TODAY_EARNINGS: 'todayEarnings',
-  FIRST_WORK_DATE: 'firstWorkDate'
+  FIRST_WORK_DATE: 'firstWorkDate',
+  USER_INFO: 'userInfo'
 };
 
 class StorageManager {
@@ -445,6 +446,47 @@ class StorageManager {
       return true;
     } catch (e) {
       console.error('清空数据失败:', e);
+      return false;
+    }
+  }
+
+  /**
+   * 保存用户信息
+   * @param {Object} userInfo {nickName, avatarUrl, isLogin}
+   */
+  static saveUserInfo(userInfo) {
+    try {
+      wx.setStorageSync(STORAGE_KEYS.USER_INFO, userInfo);
+      return true;
+    } catch (e) {
+      console.error('保存用户信息失败:', e);
+      return false;
+    }
+  }
+
+  /**
+   * 获取用户信息
+   * @returns {Object} {nickName, avatarUrl, isLogin}
+   */
+  static getUserInfo() {
+    try {
+      const userInfo = wx.getStorageSync(STORAGE_KEYS.USER_INFO);
+      return userInfo || { isLogin: false, nickName: '未登录', avatarUrl: '' };
+    } catch (e) {
+      console.error('获取用户信息失败:', e);
+      return { isLogin: false, nickName: '未登录', avatarUrl: '' };
+    }
+  }
+
+  /**
+   * 清除用户信息（退出登录）
+   */
+  static clearUserInfo() {
+    try {
+      wx.removeStorageSync(STORAGE_KEYS.USER_INFO);
+      return true;
+    } catch (e) {
+      console.error('清除用户信息失败:', e);
       return false;
     }
   }

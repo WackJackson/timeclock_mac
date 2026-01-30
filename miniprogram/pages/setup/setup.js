@@ -350,8 +350,12 @@ Page({
     const success = StorageManager.saveUserConfig(this.data.formData);
 
     if (success) {
-      // 只有首次设置时才保存首次工作日期
-      if (!this.data.isEditMode) {
+      // 保存首次工作日期（如果用户设置了）
+      if (this.data.formData.firstWorkDate) {
+        const fullDate = `${this.data.formData.firstWorkDate}-01`; // 追加日期
+        StorageManager.setFirstWorkDate(fullDate);
+      } else if (!this.data.isEditMode) {
+        // 首次设置且未填写工龄时，使用今天作为首次工作日期
         const today = StorageManager.getTodayKey();
         const existingFirstWorkDate = StorageManager.getFirstWorkDate();
         if (!existingFirstWorkDate) {

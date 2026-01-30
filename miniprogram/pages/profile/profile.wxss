@@ -16,6 +16,7 @@
   align-items: center;
   gap: 32rpx;
   margin-bottom: 48rpx;
+  position: relative;
 }
 
 .avatar {
@@ -28,9 +29,15 @@
   justify-content: center;
   font-size: 64rpx;
   box-shadow: 0 16rpx 32rpx rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  object-fit: cover;
 }
 
 .user-details {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8rpx;
@@ -44,6 +51,23 @@
 .work-info {
   font-size: 24rpx;
   opacity: 0.8;
+}
+
+/* 登录按钮 */
+.login-btn {
+  padding: 8rpx 32rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
+  border-radius: 48rpx;
+  color: white;
+  font-size: 24rpx;
+  line-height: 1.5;
+  margin: 0;
+  backdrop-filter: blur(10rpx);
+}
+
+.login-btn::after {
+  border: none;
 }
 
 /* 快捷统计 */
