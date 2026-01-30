@@ -1,5 +1,9 @@
 {
   "navigationBarTitleText": "愿望详情",
   "navigationStyle": "custom",
-  "enablePullDownRefresh": false
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "t-tag": "tdesign-miniprogram/tag/tag",
+    "t-button": "tdesign-miniprogram/button/button"
+  }
 }

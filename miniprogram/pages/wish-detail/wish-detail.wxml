@@ -32,10 +32,31 @@
       </view>
     </view>
 
-    <!-- 圆形进度 -->
-    <view class="circular-progress">
-      <view class="progress-circle">
-        <text class="progress-text">{{wishData.progress}}%</text>
+    <!-- 总进度百分比 -->
+    <view class="total-progress-percent">
+      <text class="progress-number">{{wishData.progress}}%</text>
+    </view>
+
+    <!-- 三色进度条 -->
+    <view class="multi-progress-bar">
+      <view class="progress-segment progress-normal" style="width: {{modeProgress.normal}}%;"></view>
+      <view class="progress-segment progress-burnout" style="width: {{modeProgress.burnout}}%;"></view>
+      <view class="progress-segment progress-slack" style="width: {{modeProgress.slack}}%;"></view>
+    </view>
+
+    <!-- 进度说明 -->
+    <view class="progress-legend">
+      <view class="legend-item" wx:if="{{modeProgress.normal > 0}}">
+        <view class="legend-dot legend-normal"></view>
+        <text class="legend-text">普通 {{modeProgress.normal}}%</text>
+      </view>
+      <view class="legend-item" wx:if="{{modeProgress.burnout > 0}}">
+        <view class="legend-dot legend-burnout"></view>
+        <text class="legend-text">燃尽 {{modeProgress.burnout}}%</text>
+      </view>
+      <view class="legend-item" wx:if="{{modeProgress.slack > 0}}">
+        <view class="legend-dot legend-slack"></view>
+        <text class="legend-text">摸鱼 {{modeProgress.slack}}%</text>
       </view>
     </view>
 
@@ -50,8 +71,8 @@
         <text class="stat-value">{{stats.estimatedDays}} 天后</text>
       </view>
       <view class="stat-item">
-        <text class="stat-label">日均速度</text>
-        <text class="stat-value">¥{{stats.dailyAverage}}</text>
+        <text class="stat-label">所需时间</text>
+        <text class="stat-value">{{stats.totalMinutes}} 分钟</text>
       </view>
     </view>
   </view>
@@ -60,29 +81,31 @@
   <view class="section">
     <view class="section-header">
       <text class="section-title">资金来源</text>
-      <text class="section-action" bindtap="viewAllRecords">查看全部</text>
     </view>
 
-    <view class="records-list">
+    <view class="records-list" wx:if="{{records.length > 0}}">
       <view class="record-item" wx:for="{{records}}" wx:key="id">
         <view class="record-icon" style="background: {{item.iconBg}};">
           <text class="record-emoji">{{item.icon}}</text>
         </view>
         <view class="record-info">
           <view class="record-title-row">
-            <text class="record-name">{{item.segmentName}}</text>
+            <text class="record-name">{{item.modeName}}</text>
             <t-tag
               theme="{{item.modeTheme}}"
               size="small"
               variant="light"
             >
-              {{item.modeName}}
+              {{item.minutes}}分钟
             </t-tag>
           </view>
-          <text class="record-time">{{item.date}} {{item.timeRange}}</text>
         </view>
-        <text class="record-amount" style="color: {{item.amountColor}};">+¥{{item.amount}}</text>
+        <text class="record-amount" style="color: {{item.amountColor}};">¥{{item.amount}}</text>
       </view>
+    </view>
+
+    <view class="empty-records" wx:if="{{records.length === 0}}">
+      <text class="empty-text">暂无资金来源</text>
     </view>
   </view>
 

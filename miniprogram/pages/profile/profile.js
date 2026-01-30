@@ -115,17 +115,19 @@ Page({
 
   // 计算累计统计数据
   calculateTotalStats() {
-    const allRecords = StorageManager.getWorkRecords();
-    const recordDays = Object.keys(allRecords).length;
+    // 从收入历史记录中获取数据
+    const earningsHistory = wx.getStorageSync('todayEarnings_history') || {};
+    const recordDays = Object.keys(earningsHistory).length;
 
+    // 计算累计收入（从历史记录）
     let totalEarned = 0;
-    Object.values(allRecords).forEach(dayRecords => {
-      if (Array.isArray(dayRecords)) {
-        dayRecords.forEach(record => {
-          totalEarned += parseFloat(record.amount || 0);
-        });
-      }
+    Object.values(earningsHistory).forEach(dayEarnings => {
+      totalEarned += parseFloat(dayEarnings.total || 0);
     });
+
+    // 加上今天的收入（可能还没保存到历史记录）
+    const todayEarnings = StorageManager.getTodayEarnings();
+    totalEarned += parseFloat(todayEarnings.total || 0);
 
     this.setData({
       recordDays: recordDays,
@@ -158,9 +160,97 @@ Page({
 
   // 加载统计数据
   loadStatsData(dimension) {
-    // TODO: 根据维度加载不同的数据
-    // 这里暂时使用示例数据
-    console.log('Loading stats for:', dimension);
+    const config = StorageManager.getUserConfig();
+    if (!config) return;
+
+    // 获取时薪（用于计算小时数）
+    const hourlyRate = parseFloat(config.hourlyRate || 0);
+
+    let earnings;
+    if (dimension === 'day') {
+      earnings = StorageManager.getTodayEarnings();
+    } else if (dimension === 'week') {
+      earnings = StorageManager.getWeekEarnings();
+    } else if (dimension === 'month') {
+      earnings = StorageManager.getMonthEarnings();
+    } else if (dimension === 'year') {
+      // 年度统计需要遍历整年的数据
+      earnings = this.getYearEarnings();
+    }
+
+    const total = earnings.total || 0;
+    const normal = earnings.normal || 0;
+    const burnout = earnings.burnout || 0;
+    const slack = earnings.slack || 0;
+
+    // 计算小时数
+    const totalHours = hourlyRate > 0 ? (total / hourlyRate).toFixed(1) : 0;
+    const normalHours = hourlyRate > 0 ? (normal / hourlyRate).toFixed(1) : 0;
+    const burnoutHours = hourlyRate > 0 ? (burnout / hourlyRate).toFixed(1) : 0;
+    const slackHours = hourlyRate > 0 ? (slack / hourlyRate).toFixed(1) : 0;
+
+    // 计算百分比
+    const normalPercent = total > 0 ? Math.round((normal / total) * 100) : 0;
+    const burnoutPercent = total > 0 ? Math.round((burnout / total) * 100) : 0;
+    const slackPercent = total > 0 ? Math.round((slack / total) * 100) : 0;
+
+    this.setData({
+      totalHours: totalHours,
+      modeStats: {
+        normal: {
+          hours: normalHours,
+          percent: normalPercent,
+          amount: normal.toFixed(2)
+        },
+        burnout: {
+          hours: burnoutHours,
+          percent: burnoutPercent,
+          amount: burnout.toFixed(2)
+        },
+        slack: {
+          hours: slackHours,
+          percent: slackPercent,
+          amount: slack.toFixed(2)
+        }
+      }
+    });
+  },
+
+  // 获取年度收入统计
+  getYearEarnings() {
+    try {
+      const earningsHistory = wx.getStorageSync('todayEarnings_history') || {};
+      const now = new Date();
+      const currentYear = now.getFullYear();
+
+      let total = 0;
+      let normal = 0;
+      let burnout = 0;
+      let slack = 0;
+
+      // 遍历历史记录，只统计当年的数据
+      Object.entries(earningsHistory).forEach(([dateKey, dayData]) => {
+        const [year] = dateKey.split('-');
+        if (parseInt(year) === currentYear) {
+          total += dayData.total || 0;
+          normal += dayData.normal || 0;
+          burnout += dayData.burnout || 0;
+          slack += dayData.slack || 0;
+        }
+      });
+
+      // 加上今天的数据（如果是当年）
+      const todayData = StorageManager.getTodayEarnings();
+      total += todayData.total || 0;
+      normal += todayData.normal || 0;
+      burnout += todayData.burnout || 0;
+      slack += todayData.slack || 0;
+
+      return { total, normal, burnout, slack };
+    } catch (e) {
+      console.error('获取年度收入失败:', e);
+      return { total: 0, normal: 0, burnout: 0, slack: 0 };
+    }
   },
 
   // 编辑月薪

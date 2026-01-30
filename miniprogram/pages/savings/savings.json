@@ -2,5 +2,8 @@
   "navigationBarTitleText": "攒钱观察",
   "navigationBarBackgroundColor": "#ffffff",
   "navigationBarTextStyle": "black",
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "t-tag": "tdesign-miniprogram/tag/tag"
+  }
 }

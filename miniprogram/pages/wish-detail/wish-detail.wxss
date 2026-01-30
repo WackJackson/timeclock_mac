@@ -115,32 +115,81 @@
   color: #666;
 }
 
-/* 圆形进度 */
-.circular-progress {
-  display: flex;
-  justify-content: center;
-  margin: 48rpx 0;
+/* 总进度百分比 */
+.total-progress-percent {
+  text-align: center;
+  margin: 32rpx 0 24rpx;
 }
 
-.progress-circle {
-  width: 256rpx;
-  height: 256rpx;
-  border-radius: 50%;
-  border: 16rpx solid #f0f0f0;
-  border-top-color: #0052d9;
-  border-right-color: #0052d9;
-  border-bottom-color: #60a5fa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: rotate(-45deg);
-}
-
-.progress-text {
-  transform: rotate(45deg);
-  font-size: 56rpx;
+.progress-number {
+  font-size: 72rpx;
   font-weight: bold;
   color: #0052d9;
+}
+
+/* 三色进度条 */
+.multi-progress-bar {
+  height: 24rpx;
+  background: #f0f0f0;
+  border-radius: 24rpx;
+  overflow: hidden;
+  display: flex;
+  margin-bottom: 24rpx;
+}
+
+.progress-segment {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+.progress-normal {
+  background: linear-gradient(90deg, #0052d9 0%, #60a5fa 100%);
+}
+
+.progress-burnout {
+  background: linear-gradient(90deg, #ed7b2f 0%, #f59e0b 100%);
+}
+
+.progress-slack {
+  background: linear-gradient(90deg, #00a870 0%, #10b981 100%);
+}
+
+/* 进度说明 */
+.progress-legend {
+  display: flex;
+  justify-content: center;
+  gap: 32rpx;
+  margin-bottom: 32rpx;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.legend-dot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+}
+
+.legend-normal {
+  background: #0052d9;
+}
+
+.legend-burnout {
+  background: #ed7b2f;
+}
+
+.legend-slack {
+  background: #00a870;
+}
+
+.legend-text {
+  font-size: 24rpx;
+  color: #666;
 }
 
 /* 统计信息 */
@@ -243,8 +292,13 @@
   color: #242424;
 }
 
-.record-time {
-  font-size: 20rpx;
+.empty-records {
+  padding: 80rpx 32rpx;
+  text-align: center;
+}
+
+.empty-text {
+  font-size: 28rpx;
   color: #999;
 }
 
