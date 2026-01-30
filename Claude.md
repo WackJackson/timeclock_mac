@@ -1,126 +1,248 @@
-# 工作时薪观察器 - 开发记录
+# CLAUDE.md
 
-## 项目概述
-这是一个微信小程序项目，帮助用户实时观察自己的工作时薪收益，支持多种工作模式和攒钱愿望管理。
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 核心功能模块
+## Project Overview
+工作时薪观察器 (Work Hourly Wage Observer) - A WeChat mini-program that helps users track real-time work earnings, supports multiple work modes, and manages savings goals.
 
-### 1. 时薪页面 (home)
-- 实时计算和显示秒薪、今日收入
-- 支持三种工作模式：普通模式、燃尽模式、摸鱼模式
-- 多维度进度展示：日、周、月维度
-- 工作时段管理和倒计时
-- 自动保存收入数据到激活的攒钱愿望
+**Tech Stack:**
+- WeChat Mini-Program native framework (not React/Vue)
+- TDesign WeChat Mini-Program component library
+- JavaScript (ES6+, no TypeScript in actual code despite devDependencies)
+- Local storage via `wx.setStorageSync/getStorageSync`
 
-### 2. 攒钱功能 (savings + wish-detail)
-- 愿望列表管理：创建、查看、删除愿望
-- 自定义愿望图标（支持预设emoji + 自定义输入）
-- 愿望详情页：三色进度条、资金来源统计、完成预测
-- 自动激活机制：新建时自动激活、完成后自动激活下一个
-- 按创建时间倒序显示
-- 定时刷新（2秒间隔）
+## Development Commands
 
-### 3. 数据存储 (storage-manager)
-- 用户配置：时薪、工作日、时段设置
-- 工作记录：按日期存储收入记录
-- 愿望数据：愿望列表、激活状态、资金来源记录
-- 收入统计：日/周/月维度的收入汇总
+### Setup
+```bash
+# Install dependencies
+npm install
 
-## 最近更新 (2026-01-29)
+# Build npm packages (required after npm install or when adding new packages)
+# Must be done in WeChat DevTools: Tools -> Build npm
+```
 
-### Commit: f2972d1 - 优化攒钱功能和修复进度显示bug
+### Testing
+Open the project in WeChat Developer Tools (微信开发者工具):
+1. Import project directory: `/Users/zhangyafei1/WeChatProjects/miniprogram-1`
+2. Click "Compile" button to preview
+3. Use simulator or real device preview via QR code
 
-**攒钱列表页优化：**
-1. **自定义emoji输入**
-   - 移除最后一个预设emoji（🥁）
-   - 新增自定义输入框，支持用户输入任意emoji
-   - 文件：`miniprogram/pages/savings/savings.js`、`savings.wxml`、`savings.wxss`
+**Important:** This is a WeChat mini-program, so there's no `npm start`, `npm test`, or `npm run build` commands. All development happens in WeChat DevTools.
 
-2. **列表排序和显示**
-   - 按创建时间倒序排列（最新的在最上面）
-   - 添加定时刷新机制，每2秒自动刷新数据
-   - 实现 onShow/onHide/onUnload 生命周期管理
+## Architecture
 
-3. **智能激活机制**
-   - 新建愿望时：如果当前没有进行中的任务，自动激活新任务
-   - 修改逻辑：从"第一个愿望自动激活"改为"无激活任务时自动激活"
+### File Structure
+```
+miniprogram/
+├── pages/                    # Page components (WXML + WXSS + JS + JSON per page)
+│   ├── home/                 # Real-time earnings display
+│   ├── savings/              # Savings goals list
+│   ├── wish-detail/          # Individual savings goal detail
+│   ├── profile/              # User settings and statistics
+│   └── setup/                # First-time setup wizard
+├── utils/                    # Core business logic utilities
+│   ├── storage-manager.js    # Centralized local storage management
+│   ├── salary-calculator.js  # Wage calculation based on calendar
+│   ├── countdown-calculator.js # Work segment countdowns
+│   └── util.js              # General utilities
+├── app.js                    # App entry point and lifecycle
+├── app.json                  # Global config (pages, tabBar, components)
+└── app.wxss                  # Global styles
+```
 
-**愿望详情页优化：**
-1. **定时刷新**
-   - 添加2秒定时刷新，实时显示进度变化
-   - 生命周期管理防止内存泄漏
+### Core Architecture Patterns
 
-**存储管理优化：**
-1. **自动激活下一个任务**
-   - 文件：`miniprogram/utils/storage-manager.js`
-   - 当愿望完成（进度≥100%）时：
-     - 清除当前激活状态
-     - 查找等待中的愿望（按创建时间正序）
-     - 自动激活最早创建的等待中任务
+#### 1. Central Storage Manager (`utils/storage-manager.js`)
+All data persistence goes through `StorageManager` class. **Never** call `wx.setStorageSync` directly from pages.
 
-**时薪页面bug修复：**
-1. **修复日维度进度指示器显示问题**
-   - 文件：`miniprogram/pages/home/home.js`
-   - 问题：首次进入日维度时显示 `--:--`，需切换维度后才正常
-   - 原因：`updateAll()` 调用的 `updateProgress()` 方法不更新 `currentProgressLabel`
-   - 解决：将 `updateProgress()` 改为 `updateProgressByDimension(this.data.dimensionTab)`
-   - 删除不再使用的 `updateProgress()` 方法
+**Key storage keys:**
+- `userConfig` - User's salary, workdays, work segments
+- `workRecords` - Daily work records by date (YYYY-MM-DD)
+- `wishes` - Array of savings goals
+- `activeWish` - ID of currently active savings goal
+- `currentMode` - Current work mode (normal/burnout/slack)
+- `todayEarnings` - Today's earnings breakdown by mode
 
-## 技术要点
+**Critical methods:**
+- `updateWishProgress(wishId, amount, record)` - Updates wish progress and auto-activates next wish when completed
+- `getTodayEarnings()` / `getWeekEarnings()` / `getMonthEarnings()` - Multi-dimension earnings aggregation
 
-### 进度计算逻辑
-- 日维度：当前时间 vs 工作时段范围
-- 周维度：本周已工作天数 vs 本周总工作天数
-- 月维度：本月已工作天数 vs 本月总工作天数
+#### 2. Salary Calculation System (`utils/salary-calculator.js`)
+Dynamic second-based salary calculation based on actual calendar workdays.
 
-### 三色进度条
-- 蓝色：普通模式收入占比
-- 橙色：燃尽模式收入占比
-- 绿色：摸鱼模式收入占比
-- 渐变效果增强视觉体验
+**Flow:**
+1. Calculate workdays in current month based on user's selected workdays (Mon-Sun)
+2. Calculate daily work seconds from user's segments (e.g., 09:00-12:00, 14:00-18:00)
+3. Compute second salary: `monthlySalary / (workDaysInMonth × dailyWorkSeconds)`
 
-### 定时器管理
-- 时薪页面：每秒更新一次
-- 攒钱相关页面：每2秒刷新一次
-- 生命周期钩子：onHide/onUnload 时清除定时器
+**Key methods:**
+- `getCurrentMonthSalary(config)` - Returns secondSalary for current month
+- `getCurrentSegment(segments, now)` - Returns current work segment or null
+- `calculateTodayWorkedSeconds(segments, breaks)` - How many seconds worked today
 
-### 数据类型处理
-- 金额字段兼容 number 和 string 类型
-- 使用 `typeof` 检查 + `parseFloat()` 转换
-- 格式化显示使用千分位分隔符
+#### 3. Real-time Earnings Update (`pages/home/home.js`)
+**Timer pattern:**
+- Main timer: 1-second interval updates all data
+- Auto-saves earnings every 10 seconds
+- Updates active wish progress incrementally
+- Lifecycle: Clear timer in `onHide()` and `onUnload()`
 
-## 数据结构
+**Earnings flow:**
+```
+updateAll() -> updateEarnings() -> updateActiveWishProgress()
+                                -> saveCurrentEarnings()
+```
 
-### 愿望对象结构
+#### 4. Wishes Auto-Activation System
+**Rules:**
+1. When creating new wish: If no active wish exists, auto-activate new one
+2. When wish reaches 100%: Clear active status, find oldest waiting wish by `createdDate`, auto-activate it
+3. Wishes list sorted by `createdDate` DESC (newest first)
+
+**Implementation:** `storage-manager.js` line 215-235
+
+#### 5. Multi-Dimension Progress (`pages/home/home.js`)
+Three dimension tabs: day/week/month
+
+**Pattern:**
+- Each dimension has different `progressStartLabel`, `progressEndLabel`, `currentProgressLabel`
+- Day: Shows time (e.g., "09:00", "18:00", "14:35")
+- Week: Shows weekday (e.g., "周一", "周五", "周三")
+- Month: Shows date (e.g., "1号", "31号", "15号")
+
+**Critical:** Always call `updateProgressByDimension(dimension)` instead of removed `updateProgress()` method.
+
+### WeChat Mini-Program Specifics
+
+#### Page Lifecycle
 ```javascript
-{
-  id: number,              // 愿望ID
-  name: string,            // 愿望名称
-  emoji: string,           // 图标
-  color: string,           // 渐变色
-  currentAmount: number,   // 当前金额
-  targetAmount: number,    // 目标金额
-  progress: number,        // 进度百分比
-  status: string,          // 状态：waiting/active/completed
-  createdDate: string,     // 创建日期 YYYY-MM-DD
-  completedDate: string,   // 完成日期
-  records: Array           // 资金来源记录
+onLoad(options)   // Page initialization, receives navigation params
+onShow()          // Page becomes visible (start timers here)
+onHide()          // Page hidden (clear timers here)
+onUnload()        // Page destroyed (cleanup resources here)
+```
+
+**Timer management pattern:**
+```javascript
+onShow() {
+  this.data.refreshTimer = setInterval(() => {
+    this.loadData();
+  }, 2000);
+},
+
+onHide() {
+  if (this.data.refreshTimer) {
+    clearInterval(this.data.refreshTimer);
+    this.data.refreshTimer = null;
+  }
 }
 ```
 
-### 资金来源记录结构
+#### Data Binding
+Use `this.setData({...})` to update UI. Direct assignment to `this.data` won't trigger re-render.
+
+#### Navigation
+```javascript
+wx.navigateTo({ url: '/pages/wish-detail/wish-detail?id=123' })  // Push with back button
+wx.redirectTo({ url: '/pages/home/home' })  // Replace current page
+wx.navigateBack()  // Go back
+```
+
+#### Component Usage (TDesign)
+Global components registered in `app.json`:
+- `<t-button>`, `<t-input>`, `<t-tag>`, `<t-progress>`, `<t-tabs>`, `<t-tab-panel>`, etc.
+
+Page-specific components registered in page's `.json` file.
+
+## Common Development Patterns
+
+### Adding a New Savings Wish
+1. Create wish object with `id`, `name`, `emoji`, `targetAmount`, `createdDate`
+2. Call `StorageManager.saveWishes(wishes)`
+3. If no active wish, call `StorageManager.setActiveWish(newId)`
+4. UI auto-refreshes via 2-second timer
+
+### Modifying Data Structures
+**Important:** Amount fields are stored as both `number` and `string` (historical inconsistency).
+Always handle both:
+```javascript
+const amount = typeof value === 'number'
+  ? value
+  : parseFloat((value || '0').toString().replace(/,/g, ''));
+```
+
+### Adding New Work Modes
+Currently: `normal`, `burnout`, `slack`
+1. Update mode stats in `StorageManager.getTodayEarnings()`
+2. Add mode display in `pages/home/home.wxml` and `home.js`
+3. Update `formatRecords()` in `wish-detail.js` for mode aggregation
+4. Add corresponding gradient colors in WXSS
+
+## Critical Bugs to Avoid
+
+1. **Don't update completed wishes:** Check `wish.status === 'completed' || wish.progress >= 100` before updating
+2. **Clear timers:** Always clear intervals in `onHide()`/`onUnload()`
+3. **Use StorageManager:** Never call `wx.setStorageSync()` directly from pages
+4. **Dimension-aware progress:** Use `updateProgressByDimension()`, not removed `updateProgress()`
+5. **Type-safe amounts:** Always handle both number and string types for amount fields
+
+## Data Persistence Notes
+- All data stored locally via WeChat's sync storage API
+- No backend server, no API calls
+- Data persists across app restarts
+- Storage keys defined in `utils/storage-manager.js` STORAGE_KEYS constant
+
+## Recent Changes (Reference Only)
+
+### 2026-01-30: Savings Features and Progress Bug Fix (Commit f2972d1)
+- Added custom emoji input for savings wishes (removed last preset emoji 🥁)
+- Wishes now sorted by `createdDate` DESC (newest first)
+- Auto-activation: New wish activates if no active wish exists
+- Auto-activation: Completed wish triggers activation of oldest waiting wish
+- Added 2-second refresh timers to savings pages
+- Fixed day dimension progress indicator showing `--:--` on first load
+
+## Data Structures (Key Types)
+
+### Wish Object
 ```javascript
 {
-  date: string,           // 日期 YYYY-MM-DD
-  segmentName: string,    // 时段名称
-  mode: string,           // 模式：normal/burnout/slack
-  amount: string,         // 金额
-  timestamp: number       // 时间戳
+  id: number,
+  name: string,
+  emoji: string,
+  color: string,              // CSS gradient
+  currentAmount: number,      // Can also be string (handle both!)
+  targetAmount: number,       // Can also be string (handle both!)
+  progress: number,           // 0-100
+  status: string,             // 'waiting' | 'active' | 'completed'
+  createdDate: string,        // 'YYYY-MM-DD'
+  completedDate: string,      // 'YYYY-MM-DD' (optional)
+  records: Array<Record>      // Funding source records
 }
 ```
 
-## 待优化项
-- [ ] 愿望编辑功能（当前仅有删除）
-- [ ] 资金来源详细记录查看
-- [ ] 历史数据图表展示
-- [ ] 导出数据功能
+### Funding Record
+```javascript
+{
+  date: string,              // 'YYYY-MM-DD'
+  segmentName: string,       // e.g., '上午工作'
+  mode: string,              // 'normal' | 'burnout' | 'slack'
+  amount: string,
+  timestamp: number
+}
+```
+
+### User Config
+```javascript
+{
+  salary: string,            // Monthly salary
+  workdays: Array<number>,   // [1, 2, 3, 4, 5] = Mon-Fri, 0 = Sun, 6 = Sat
+  segments: Array<{
+    name: string,
+    startTime: string,       // 'HH:mm'
+    endTime: string          // 'HH:mm'
+  }>,
+  hourlyRate: number         // Computed: salary / (workdays * segments)
+}
+```
