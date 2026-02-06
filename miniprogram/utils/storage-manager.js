@@ -331,6 +331,7 @@ class StorageManager {
       const today = now.getDay(); // 0-6, 0是周日
       const monday = new Date(now);
       monday.setDate(now.getDate() - (today === 0 ? 6 : today - 1)); // 调整到本周一
+      const todayKey = this.getTodayKey();
 
       let total = 0;
       let normal = 0;
@@ -354,12 +355,14 @@ class StorageManager {
         }
       }
 
-      // 加上今天的数据
-      const todayData = this.getTodayEarnings();
-      total += todayData.total || 0;
-      normal += todayData.normal || 0;
-      burnout += todayData.burnout || 0;
-      slack += todayData.slack || 0;
+      // 如果今天的数据还没有保存到历史记录中，单独加上
+      if (!allEarnings[todayKey]) {
+        const todayData = this.getTodayEarnings();
+        total += todayData.total || 0;
+        normal += todayData.normal || 0;
+        burnout += todayData.burnout || 0;
+        slack += todayData.slack || 0;
+      }
 
       return { total, normal, burnout, slack };
     } catch (e) {
@@ -377,6 +380,7 @@ class StorageManager {
       const now = new Date();
       const year = now.getFullYear();
       const month = now.getMonth();
+      const todayKey = this.getTodayKey();
 
       let total = 0;
       let normal = 0;
@@ -400,12 +404,14 @@ class StorageManager {
         }
       }
 
-      // 加上今天的数据
-      const todayData = this.getTodayEarnings();
-      total += todayData.total || 0;
-      normal += todayData.normal || 0;
-      burnout += todayData.burnout || 0;
-      slack += todayData.slack || 0;
+      // 如果今天的数据还没有保存到历史记录中，单独加上
+      if (!allEarnings[todayKey]) {
+        const todayData = this.getTodayEarnings();
+        total += todayData.total || 0;
+        normal += todayData.normal || 0;
+        burnout += todayData.burnout || 0;
+        slack += todayData.slack || 0;
+      }
 
       return { total, normal, burnout, slack };
     } catch (e) {

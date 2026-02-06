@@ -52,6 +52,10 @@ Page({
   // 加载用户信息
   loadUserInfo() {
     const userInfo = StorageManager.getUserInfo();
+    // 简化 openid 显示（只显示后6位）
+    if (userInfo && userInfo.openid) {
+      userInfo.shortId = userInfo.openid.slice(-6);
+    }
     this.setData({ userInfo });
   },
 
@@ -62,68 +66,156 @@ Page({
       mask: true
     });
 
-    // 获取用户信息
-    wx.getUserProfile({
-      desc: '用于完善用户资料',
-      success: async (res) => {
-        const { nickName, avatarUrl } = res.userInfo;
+    // 直接调用云函数登录，使用默认头像（空字符串会在WXML中显示emoji）
+    this.performLogin('微信用户', '');
+  },
 
-        try {
-          // 调用云函数进行登录
-          const cloudResult = await wx.cloud.callFunction({
-            name: 'login',
-            data: {
-              nickName,
-              avatarUrl
-            }
-          });
-
-          wx.hideLoading();
-
-          if (cloudResult.result.success) {
-            const userInfo = {
-              isLogin: true,
-              nickName,
-              avatarUrl,
-              openid: cloudResult.result.openid
-            };
-
-            StorageManager.saveUserInfo(userInfo);
-            this.setData({ userInfo });
-
-            // 保存到全局数据
-            const app = getApp();
-            app.globalData.openid = cloudResult.result.openid;
-
-            wx.showToast({
-              title: cloudResult.result.message,
-              icon: 'success'
-            });
-
-            // 登录成功后自动同步数据
-            this.autoSyncData(cloudResult.result.isNewUser);
-          } else {
-            throw new Error(cloudResult.result.error || '登录失败');
-          }
-        } catch (err) {
-          wx.hideLoading();
-          console.error('登录失败:', err);
-          wx.showModal({
-            title: '登录失败',
-            content: err.message || '请检查网络连接和云开发配置',
-            showCancel: false
-          });
+  // 执行登录
+  async performLogin(nickName, avatarUrl) {
+    try {
+      // 调用云函数进行登录
+      const cloudResult = await wx.cloud.callFunction({
+        name: 'login',
+        data: {
+          nickName,
+          avatarUrl
         }
-      },
-      fail: (err) => {
-        wx.hideLoading();
-        console.error('获取用户信息失败:', err);
+      });
+
+      wx.hideLoading();
+
+      if (cloudResult.result.success) {
+        const userInfo = {
+          isLogin: true,
+          nickName,
+          avatarUrl,
+          openid: cloudResult.result.openid
+        };
+
+        StorageManager.saveUserInfo(userInfo);
+
+        // 简化 openid 显示
+        if (userInfo.openid) {
+          userInfo.shortId = userInfo.openid.slice(-6);
+        }
+
+        this.setData({ userInfo });
+
+        // 保存到全局数据
+        const app = getApp();
+        app.globalData.openid = cloudResult.result.openid;
+
         wx.showToast({
-          title: '取消登录',
-          icon: 'none'
+          title: '登录成功，点击头像和昵称可修改',
+          icon: 'none',
+          duration: 2000
         });
+
+        // 登录成功后自动同步数据
+        this.autoSyncData(cloudResult.result.isNewUser);
+      } else {
+        throw new Error(cloudResult.result.error || '登录失败');
+      }
+    } catch (err) {
+      wx.hideLoading();
+      console.error('登录失败:', err);
+      wx.showModal({
+        title: '登录失败',
+        content: err.message || '请检查网络连接和云开发配置',
+        showCancel: false
+      });
+    }
+  },
+
+  // 选择头像
+  onChooseAvatar(e) {
+    const { avatarUrl } = e.detail;
+
+    // 更新本地数据
+    const userInfo = this.data.userInfo;
+    userInfo.avatarUrl = avatarUrl;
+
+    StorageManager.saveUserInfo(userInfo);
+    this.setData({ userInfo });
+
+    // 更新云端数据
+    this.updateCloudUserInfo(userInfo.nickName, avatarUrl);
+
+    wx.showToast({
+      title: '头像已更新',
+      icon: 'success'
+    });
+  },
+
+  // 显示昵称输入选择器
+  showNicknameInput() {
+    const that = this;
+    wx.showActionSheet({
+      itemList: ['使用微信昵称（推荐）', '手动输入昵称'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          // 使用微信昵称（官方推荐方式）
+          that.showWechatNicknameInput();
+        } else if (res.tapIndex === 1) {
+          // 手动输入
+          that.showManualNicknameInput();
+        }
       }
     });
+  },
+
+  // 显示微信昵称输入框（官方推荐方式）
+  showWechatNicknameInput() {
+    wx.navigateTo({
+      url: '/pages/edit-nickname/edit-nickname'
+    });
+  },
+
+  // 手动输入昵称
+  showManualNicknameInput() {
+    const that = this;
+    wx.showModal({
+      title: '修改昵称',
+      editable: true,
+      placeholderText: '请输入昵称',
+      content: this.data.userInfo.nickName === '微信用户' ? '' : this.data.userInfo.nickName,
+      success: (res) => {
+        if (res.confirm && res.content) {
+          const newNickName = res.content.trim();
+          if (newNickName) {
+            // 更新本地数据
+            const userInfo = that.data.userInfo;
+            userInfo.nickName = newNickName;
+
+            StorageManager.saveUserInfo(userInfo);
+            that.setData({ userInfo });
+
+            // 更新云端数据
+            that.updateCloudUserInfo(newNickName, userInfo.avatarUrl);
+
+            wx.showToast({
+              title: '昵称已更新',
+              icon: 'success'
+            });
+          }
+        }
+      }
+    });
+  },
+
+  // 更新云端用户信息
+  async updateCloudUserInfo(nickName, avatarUrl) {
+    try {
+      await wx.cloud.callFunction({
+        name: 'login',
+        data: {
+          nickName,
+          avatarUrl
+        }
+      });
+    } catch (err) {
+      console.error('更新用户信息失败:', err);
+    }
   },
 
   // 退出登录
@@ -287,10 +379,10 @@ Page({
     const slack = earnings.slack || 0;
 
     // 计算小时数（金额 / 秒薪 / 3600）
-    const totalHours = secondSalary > 0 ? (total / secondSalary / 3600).toFixed(1) : 0;
-    const normalHours = secondSalary > 0 ? (normal / secondSalary / 3600).toFixed(1) : 0;
-    const burnoutHours = secondSalary > 0 ? (burnout / secondSalary / 3600).toFixed(1) : 0;
-    const slackHours = secondSalary > 0 ? (slack / secondSalary / 3600).toFixed(1) : 0;
+    const totalHours = secondSalary > 0 ? (total / secondSalary / 3600).toFixed(1) : '0.0';
+    const normalHours = secondSalary > 0 ? (normal / secondSalary / 3600).toFixed(1) : '0.0';
+    const burnoutHours = secondSalary > 0 ? (burnout / secondSalary / 3600).toFixed(1) : '0.0';
+    const slackHours = secondSalary > 0 ? (slack / secondSalary / 3600).toFixed(1) : '0.0';
 
     // 计算百分比
     const normalPercent = total > 0 ? Math.round((normal / total) * 100) : 0;
