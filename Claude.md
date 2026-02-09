@@ -5,9 +5,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Communication Protocol
 
 **Token Usage Reporting:**
-- At the end of each conversation, report the remaining token percentage for the current month
-- Format: "本月token剩余：X.XX%"
+- At the end of each conversation, report the following information:
+  1. **本轮对话使用token:** X tokens
+  2. **本轮对话成本:** ¥X.XX (基于当前API定价)
+  3. **本月token剩余:** X.XX% (剩余/总量)
 - Always include this information in the final response to the user
+- Token cost calculation should be based on the current Anthropic API pricing for Claude Opus 4.5
 
 ## Project Overview
 工作时薪观察器 (Work Hourly Wage Observer) - A WeChat mini-program that helps users track real-time work earnings, supports multiple work modes, and manages savings goals.
