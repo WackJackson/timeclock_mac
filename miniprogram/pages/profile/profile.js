@@ -34,7 +34,8 @@ Page({
         percent: 0,
         amount: '0.00'
       }
-    }
+    },
+    refreshTimer: null
   },
 
   onLoad() {
@@ -62,8 +63,29 @@ Page({
       this.loadUserInfo();
       this.loadUserData();
 
+      // 启动定时刷新（每2秒刷新一次）
+      this.data.refreshTimer = setInterval(() => {
+        this.loadUserData();
+      }, 2000);
+
       // 触发一次自动同步
       StorageManager.autoSyncToCloud();
+    }
+  },
+
+  onHide() {
+    // 页面隐藏时清除定时器
+    if (this.data.refreshTimer) {
+      clearInterval(this.data.refreshTimer);
+      this.data.refreshTimer = null;
+    }
+  },
+
+  onUnload() {
+    // 页面卸载时清除定时器
+    if (this.data.refreshTimer) {
+      clearInterval(this.data.refreshTimer);
+      this.data.refreshTimer = null;
     }
   },
 
