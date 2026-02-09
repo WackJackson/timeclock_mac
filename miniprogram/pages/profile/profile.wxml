@@ -1,4 +1,20 @@
 <view class="profile-container">
+  <!-- 未登录时显示的引导界面 -->
+  <view class="login-guide" wx:if="{{showLoginGuide}}">
+    <view class="guide-card">
+      <view class="guide-icon">🔐</view>
+      <text class="guide-title">欢迎使用工作时薪观察器</text>
+      <text class="guide-desc">请先登录并设置个人信息，以使用完整功能</text>
+
+      <!-- 登录按钮 -->
+      <button class="guide-login-btn" bindtap="handleLogin">
+        立即登录
+      </button>
+    </view>
+  </view>
+
+  <!-- 已登录时显示的完整界面 -->
+  <view wx:else>
   <!-- 头部 -->
   <view class="profile-header">
     <!-- 未登录状态 -->
@@ -12,10 +28,15 @@
 
     <!-- 已登录状态 -->
     <view class="user-info" wx:if="{{userInfo.isLogin}}">
-      <image class="avatar avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+      <!-- 头像（可点击修改） -->
+      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <image wx:if="{{userInfo.avatarUrl}}" class="avatar avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar">👤</view>
+      </button>
       <view class="user-details">
-        <text class="username">{{userInfo.nickName}}</text>
-        <text class="work-info">工龄 {{workYears}} · 已记录 {{recordDays}} 天</text>
+        <!-- 昵称（可点击修改） -->
+        <text class="username" bindtap="showNicknameInput">{{userInfo.nickName}}</text>
+        <text class="work-info">工龄 {{workYears}} · 已记录 {{recordDays}} 天 · ID {{userInfo.shortId}}</text>
       </view>
     </view>
 
@@ -167,5 +188,6 @@
         bindtap="showAbout"
       />
     </t-cell-group>
+  </view>
   </view>
 </view>

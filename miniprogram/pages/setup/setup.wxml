@@ -8,18 +8,18 @@
   <!-- 进度指示器（仅首次设置时显示） -->
   <view class="progress-indicator" wx:if="{{!isEditMode}}">
     <view class="progress-bars">
+      <view class="progress-bar {{step >= 0 ? 'active' : ''}}"></view>
       <view class="progress-bar {{step >= 1 ? 'active' : ''}}"></view>
       <view class="progress-bar {{step >= 2 ? 'active' : ''}}"></view>
       <view class="progress-bar {{step >= 3 ? 'active' : ''}}"></view>
-      <view class="progress-bar {{step >= 4 ? 'active' : ''}}"></view>
     </view>
-    <text class="progress-text">步骤 {{step}}/4</text>
+    <text class="progress-text">步骤 {{step + 1}}/4</text>
   </view>
 
   <!-- 表单内容 -->
   <scroll-view class="form-content" scroll-y>
-    <!-- 步骤1: 月薪设置 -->
-    <view class="form-section" wx:if="{{step === 1}}">
+    <!-- 步骤0: 月薪设置 -->
+    <view class="form-section" wx:if="{{step === 0}}">
       <view class="form-card">
         <view class="form-label">
           <view class="label-icon">💰</view>
@@ -39,8 +39,8 @@
       </view>
     </view>
 
-    <!-- 步骤2: 工作日设定 -->
-    <view class="form-section" wx:if="{{step === 2}}">
+    <!-- 步骤1: 工作日设定 -->
+    <view class="form-section" wx:if="{{step === 1}}">
       <view class="form-card">
         <view class="form-label">
           <view class="label-icon">📅</view>
@@ -60,8 +60,8 @@
       </view>
     </view>
 
-    <!-- 步骤3: 时段规划 -->
-    <view class="form-section" wx:if="{{step === 3}}">
+    <!-- 步骤2: 时段规划 -->
+    <view class="form-section" wx:if="{{step === 2}}">
       <view class="form-card">
         <view class="form-label">
           <view class="label-icon">⏰</view>
@@ -128,8 +128,8 @@
       </view>
     </view>
 
-    <!-- 步骤4: 工龄设置 -->
-    <view class="form-section" wx:if="{{step === 4}}">
+    <!-- 步骤3: 工龄设置 -->
+    <view class="form-section" wx:if="{{step === 3}}">
       <view class="form-card">
         <view class="form-label">
           <view class="label-icon">👔</view>
@@ -172,7 +172,7 @@
 
     <!-- 首次设置模式：下一步/完成设置 -->
     <t-button
-      wx:if="{{!isEditMode && step < 4}}"
+      wx:if="{{!isEditMode && step < 3}}"
       theme="primary"
       size="large"
       block
@@ -181,7 +181,7 @@
       下一步
     </t-button>
     <t-button
-      wx:if="{{!isEditMode && step === 4}}"
+      wx:if="{{!isEditMode && step === 3}}"
       theme="primary"
       size="large"
       block

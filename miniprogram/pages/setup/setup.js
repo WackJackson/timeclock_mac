@@ -2,7 +2,7 @@ const { StorageManager } = require('../../utils/storage-manager.js');
 
 Page({
   data: {
-    step: 1,
+    step: 0, // 从步骤0开始（月薪设置）
     isEditMode: false,
     formData: {
       salary: '15000',
@@ -41,7 +41,7 @@ Page({
   onLoad(options) {
     // 检查是否是编辑模式
     const isEdit = options && options.edit === 'true';
-    const targetStep = options && options.step ? parseInt(options.step) : 1;
+    const targetStep = options && options.step ? parseInt(options.step) : 0;
 
     if (!isEdit) {
       // 非编辑模式：检查是否已经完成过设置
@@ -53,6 +53,8 @@ Page({
         });
         return;
       }
+      // 首次设置，从步骤0开始（月薪设置）
+      this.setData({ step: 0 });
     } else {
       // 编辑模式：加载已有配置
       const config = StorageManager.getUserConfig();
@@ -79,7 +81,7 @@ Page({
           },
           weekdays: weekdays,
           isEditMode: true,
-          step: targetStep // 跳转到指定步骤
+          step: targetStep // 编辑模式直接使用传入的步骤号
         });
       }
     }
@@ -286,7 +288,7 @@ Page({
       return;
     }
 
-    if (this.data.step < 4) {
+    if (this.data.step < 3) {
       this.setData({
         step: this.data.step + 1
       });
@@ -297,7 +299,7 @@ Page({
   validateStep() {
     const { step, formData } = this.data;
 
-    if (step === 1) {
+    if (step === 0) {
       if (!formData.salary || parseFloat(formData.salary) <= 0) {
         wx.showToast({
           title: '请输入有效的月薪',
@@ -307,7 +309,7 @@ Page({
       }
     }
 
-    if (step === 2) {
+    if (step === 1) {
       if (formData.workdays.length === 0) {
         wx.showToast({
           title: '请至少选择一个工作日',
@@ -317,7 +319,7 @@ Page({
       }
     }
 
-    if (step === 3) {
+    if (step === 2) {
       if (formData.segments.length === 0) {
         wx.showToast({
           title: '请至少添加一个工作时段',
@@ -327,7 +329,7 @@ Page({
       }
     }
 
-    // 步骤4工龄设置是可选的，不需要验证
+    // 步骤3工龄设置是可选的，不需要验证
 
     return true;
   },
@@ -387,8 +389,8 @@ Page({
       return;
     }
 
-    // 如果是第4步（工龄设置），只保存首次工作日期
-    if (this.data.step === 4) {
+    // 如果是第3步（工龄设置），只保存首次工作日期
+    if (this.data.step === 3) {
       const firstWorkDate = this.data.formData.firstWorkDate;
       // 转换为完整日期格式（补充01作为日）
       const fullDate = `${firstWorkDate}-01`;

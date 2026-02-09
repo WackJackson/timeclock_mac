@@ -2,6 +2,8 @@ const { StorageManager } = require('../../utils/storage-manager.js');
 
 Page({
   data: {
+    needLogin: false,
+    showLoginGuide: false,
     userInfo: {
       isLogin: false,
       nickName: '未登录',
@@ -36,17 +38,33 @@ Page({
   },
 
   onLoad() {
+    const userInfo = StorageManager.getUserInfo();
+
+    // 检查是否已登录
+    if (!userInfo.isLogin) {
+      // 未登录：显示登录引导界面
+      this.setData({
+        needLogin: true,
+        showLoginGuide: true
+      });
+      return;  // 不加载其他数据
+    }
+
+    // 已登录：正常加载数据
     this.loadUserInfo();
     this.loadUserData();
   },
 
   onShow() {
-    // 每次显示页面时重新加载
-    this.loadUserInfo();
-    this.loadUserData();
+    // 如果已登录，每次显示页面时重新加载
+    const userInfo = StorageManager.getUserInfo();
+    if (userInfo.isLogin) {
+      this.loadUserInfo();
+      this.loadUserData();
 
-    // 触发一次自动同步
-    StorageManager.autoSyncToCloud();
+      // 触发一次自动同步
+      StorageManager.autoSyncToCloud();
+    }
   },
 
   // 加载用户信息
@@ -105,14 +123,14 @@ Page({
         const app = getApp();
         app.globalData.openid = cloudResult.result.openid;
 
+        // 调用登录成功回调
+        this.onLoginSuccess(cloudResult.result.isNewUser);
+
         wx.showToast({
           title: '登录成功，点击头像和昵称可修改',
           icon: 'none',
           duration: 2000
         });
-
-        // 登录成功后自动同步数据
-        this.autoSyncData(cloudResult.result.isNewUser);
       } else {
         throw new Error(cloudResult.result.error || '登录失败');
       }
@@ -125,6 +143,19 @@ Page({
         showCancel: false
       });
     }
+  },
+
+  // 登录成功回调
+  onLoginSuccess(isNewUser) {
+    this.setData({
+      needLogin: false,
+      showLoginGuide: false
+    });
+    this.loadUserInfo();
+    this.loadUserData();
+
+    // 自动同步数据
+    this.autoSyncData(isNewUser);
   },
 
   // 选择头像
@@ -493,28 +524,28 @@ Page({
   // 编辑月薪
   editSalary() {
     wx.navigateTo({
-      url: '/pages/setup/setup?edit=true&step=1'
+      url: '/pages/setup/setup?edit=true&step=0'
     });
   },
 
   // 编辑工作日
   editWorkdays() {
     wx.navigateTo({
-      url: '/pages/setup/setup?edit=true&step=2'
+      url: '/pages/setup/setup?edit=true&step=1'
     });
   },
 
   // 编辑工作时段
   editWorktime() {
     wx.navigateTo({
-      url: '/pages/setup/setup?edit=true&step=3'
+      url: '/pages/setup/setup?edit=true&step=2'
     });
   },
 
   // 编辑工龄
   editWorkTenure() {
     wx.navigateTo({
-      url: '/pages/setup/setup?edit=true&step=4'
+      url: '/pages/setup/setup?edit=true&step=3'
     });
   },
 
