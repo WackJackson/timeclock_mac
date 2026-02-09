@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Communication Protocol
+
+**Token Usage Reporting:**
+- At the end of each conversation, report the remaining token percentage for the current month
+- Format: "本月token剩余：X.XX%"
+- Always include this information in the final response to the user
+
 ## Project Overview
 工作时薪观察器 (Work Hourly Wage Observer) - A WeChat mini-program that helps users track real-time work earnings, supports multiple work modes, and manages savings goals.
 
@@ -193,7 +200,46 @@ Currently: `normal`, `burnout`, `slack`
 - Data persists across app restarts
 - Storage keys defined in `utils/storage-manager.js` STORAGE_KEYS constant
 
+## User Flow Architecture
+
+### Initial Setup and Login Flow
+**Critical:** Login flow has been separated from initial setup (as of 2026-02-09 refactoring).
+
+**New User Flow:**
+1. App launch → Home page checks `userConfig`
+2. If no config → Redirect to setup page (4 steps: salary, workdays, segments, work tenure)
+3. Complete setup → Return to home page (app is usable, data stored locally only)
+4. User navigates to Profile tab → Shows login guide if not logged in
+5. User clicks "立即登录" → Login → Auto cloud sync → Full profile page displayed
+
+**Setup Page Steps (0-3):**
+- Step 0: Monthly salary input
+- Step 1: Workdays selection (Mon-Sun)
+- Step 2: Work segments planning (multiple segments supported)
+- Step 3: Work tenure (optional)
+
+**Profile Page Login Gate:**
+- `onLoad()` checks `userInfo.isLogin`
+- If not logged in: Shows login guide interface (`showLoginGuide = true`)
+- After login success: Calls `onLoginSuccess()` → Loads user data → Auto syncs to cloud
+- Edit links in profile use step numbers 0-3 (not 1-4)
+
+### Cloud Sync Architecture
+- Login is optional for basic app usage
+- Login enables cloud sync and multi-device access
+- `StorageManager.autoSyncToCloud()` called on profile page `onShow()`
+- New users: Upload local data to cloud
+- Returning users: Smart merge of cloud and local data
+
 ## Recent Changes (Reference Only)
+
+### 2026-02-09: Login Flow Refactoring
+- **Moved login from setup to profile page**
+- Setup page now has 4 steps (0-3) instead of 5, no longer includes login
+- Profile page shows login guide for unauthenticated users
+- Login is optional - users can use core features without logging in
+- Step numbers updated: salary (0), workdays (1), segments (2), tenure (3)
+- All edit links in profile page updated to use new step numbers
 
 ### 2026-01-30: Savings Features and Progress Bug Fix (Commit f2972d1)
 - Added custom emoji input for savings wishes (removed last preset emoji 🥁)
