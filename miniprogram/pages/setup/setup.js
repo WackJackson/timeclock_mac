@@ -295,6 +295,15 @@ Page({
     }
   },
 
+  // 上一步
+  prevStep() {
+    if (this.data.step > 0) {
+      this.setData({
+        step: this.data.step - 1
+      });
+    }
+  },
+
   // 验证步骤
   validateStep() {
     const { step, formData } = this.data;

@@ -366,3 +366,22 @@
   font-size: 40rpx;
   color: #999;
 }
+
+/* 按钮布局 */
+.setup-buttons {
+  display: flex;
+  gap: 24rpx;
+}
+
+.prev-button {
+  flex: 1;
+}
+
+.next-button {
+  flex: 2;
+}
+
+.full-button {
+  flex: 1;
+}
+

@@ -170,24 +170,38 @@
       保存
     </t-button>
 
-    <!-- 首次设置模式：下一步/完成设置 -->
-    <t-button
-      wx:if="{{!isEditMode && step < 3}}"
-      theme="primary"
-      size="large"
-      block
-      bindtap="nextStep"
-    >
-      下一步
-    </t-button>
-    <t-button
-      wx:if="{{!isEditMode && step === 3}}"
-      theme="primary"
-      size="large"
-      block
-      bindtap="completeSetup"
-    >
-      完成设置
-    </t-button>
+    <!-- 首次设置模式：上一步 + 下一步/完成设置 -->
+    <view wx:if="{{!isEditMode}}" class="setup-buttons">
+      <!-- 上一步按钮（步骤1-3显示） -->
+      <t-button
+        wx:if="{{step > 0}}"
+        theme="default"
+        size="large"
+        class="prev-button"
+        bindtap="prevStep"
+      >
+        上一步
+      </t-button>
+
+      <!-- 下一步/完成设置按钮 -->
+      <t-button
+        wx:if="{{step < 3}}"
+        theme="primary"
+        size="large"
+        class="{{step > 0 ? 'next-button' : 'full-button'}}"
+        bindtap="nextStep"
+      >
+        下一步
+      </t-button>
+      <t-button
+        wx:if="{{step === 3}}"
+        theme="primary"
+        size="large"
+        class="next-button"
+        bindtap="completeSetup"
+      >
+        完成设置
+      </t-button>
+    </view>
   </view>
 </view>
