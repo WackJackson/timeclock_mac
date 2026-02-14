@@ -53,5 +53,6 @@
     "t-tab-panel": "tdesign-miniprogram/tab-panel/tab-panel"
   },
   "componentFramework": "glass-easel",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "cloud": true
 }

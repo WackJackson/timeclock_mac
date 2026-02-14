@@ -2,7 +2,8 @@
 const cloud = require('wx-server-sdk');
 
 cloud.init({
-  env: cloud.DYNAMIC_CURRENT_ENV
+  env: 'timebomp-2g4siacf47b7e567',
+  traceUser: true
 });
 
 const db = cloud.database();
@@ -13,6 +14,16 @@ exports.main = async (event, context) => {
 
   try {
     const openid = wxContext.OPENID;
+
+    // 🚨 加强验证：检查所有无效的 openid
+    if (!openid || openid === 'undefined' || openid === 'null' || openid.trim() === '') {
+      console.error('无效的 openid:', openid, 'type:', typeof openid);
+      return {
+        success: false,
+        error: '用户未登录或 openid 无效，无法同步数据',
+        code: 'INVALID_OPENID'
+      };
+    }
 
     switch (action) {
       case 'upload':
@@ -46,8 +57,15 @@ exports.main = async (event, context) => {
 // 上传数据
 async function uploadData(openid, localData) {
   try {
-    // 查询用户数据记录
-    const userDataQuery = await db.collection('user_data').limit(1).get();
+    // 验证 openid
+    if (!openid || openid === 'undefined' || openid === 'null') {
+      throw new Error('无效的 openid');
+    }
+
+    // 查询用户数据记录（按 openid 查询）
+    const userDataQuery = await db.collection('user_data').where({
+      _openid: openid
+    }).limit(1).get();
 
     const now = new Date();
     const syncData = {
@@ -67,6 +85,7 @@ async function uploadData(openid, localData) {
       // 首次上传，创建记录
       await db.collection('user_data').add({
         data: {
+          _openid: openid,  // 🔑 手动添加 _openid
           ...syncData,
           createTime: now
         }
@@ -91,7 +110,15 @@ async function uploadData(openid, localData) {
 // 下载数据
 async function downloadData(openid) {
   try {
-    const userDataQuery = await db.collection('user_data').limit(1).get();
+    // 验证 openid
+    if (!openid || openid === 'undefined' || openid === 'null') {
+      throw new Error('无效的 openid');
+    }
+
+    // 查询用户数据记录（按 openid 查询）
+    const userDataQuery = await db.collection('user_data').where({
+      _openid: openid
+    }).limit(1).get();
 
     if (userDataQuery.data.length === 0) {
       return {
@@ -127,7 +154,15 @@ async function downloadData(openid) {
 // 智能同步（合并策略）
 async function syncData(openid, localData) {
   try {
-    const userDataQuery = await db.collection('user_data').limit(1).get();
+    // 验证 openid
+    if (!openid || openid === 'undefined' || openid === 'null') {
+      throw new Error('无效的 openid');
+    }
+
+    // 查询用户数据记录（按 openid 查询）
+    const userDataQuery = await db.collection('user_data').where({
+      _openid: openid
+    }).limit(1).get();
 
     if (userDataQuery.data.length === 0) {
       // 云端无数据，直接上传本地数据

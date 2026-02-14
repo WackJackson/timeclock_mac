@@ -2,7 +2,8 @@
 const cloud = require('wx-server-sdk');
 
 cloud.init({
-  env: cloud.DYNAMIC_CURRENT_ENV
+  env: 'timebomp-2g4siacf47b7e567',
+  traceUser: true
 });
 
 const db = cloud.database();
@@ -16,8 +17,20 @@ exports.main = async (event, context) => {
     // 获取用户openid
     const openid = wxContext.OPENID;
 
-    // 查询当前用户的记录（云开发会自动按_openid过滤）
-    const userQuery = await db.collection('users').limit(1).get();
+    // 🚨 验证openid是否有效
+    if (!openid || openid === 'undefined' || openid === 'null' || openid.trim() === '') {
+      console.error('无效的 openid:', openid, 'type:', typeof openid);
+      return {
+        success: false,
+        error: '获取用户身份失败，请检查云开发配置',
+        code: 'INVALID_OPENID'
+      };
+    }
+
+    // 查询当前用户的记录（必须按_openid过滤）
+    const userQuery = await db.collection('users').where({
+      _openid: openid
+    }).limit(1).get();
 
     const now = new Date();
 
@@ -25,6 +38,7 @@ exports.main = async (event, context) => {
       // 新用户，创建记录
       const addResult = await db.collection('users').add({
         data: {
+          _openid: openid,  // 🔑 手动添加 _openid
           nickName,
           avatarUrl,
           createTime: now,
