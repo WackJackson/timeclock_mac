@@ -18,9 +18,17 @@ Page({
       integer: '0',
       decimal: '00'
     },
+    actualTodayTotal: 0, // 实际今日累计总额（用于计算增量，不受维度切换影响）
     workDaysInMonth: 0,
 
-    // 今日统计
+    // 今日统计（实际累加的，用于保存）
+    actualTodayStats: {
+      normal: 0,
+      burnout: 0,
+      slack: 0
+    },
+
+    // 显示用统计（根据维度变化）
     stats: {
       normal: 0,
       burnout: 0,
@@ -73,6 +81,10 @@ Page({
   onShow() {
     // 页面显示时重新加载数据
     this.loadConfig();
+
+    // 验证数据一致性（开发调试用）
+    this.validateDataConsistency();
+
     this.updateAll();
   },
 
@@ -125,6 +137,11 @@ Page({
       workStartTime,
       workEndTime,
       currentMode,
+      actualTodayStats: {
+        normal: todayEarnings.normal || 0,
+        burnout: todayEarnings.burnout || 0,
+        slack: todayEarnings.slack || 0
+      },
       stats: {
         normal: todayEarnings.normal || 0,
         burnout: todayEarnings.burnout || 0,
@@ -149,7 +166,8 @@ Page({
       todayEarned: {
         integer: parts[0],
         decimal: parts[1]
-      }
+      },
+      actualTodayTotal: totalEarned // 同时保存实际总额
     });
   },
 
@@ -328,7 +346,7 @@ Page({
 
   // 更新收入
   updateEarnings(now) {
-    const { secondSalary, currentMode, lastUpdateTime } = this.data;
+    const { secondSalary, currentMode, lastUpdateTime, dimensionTab } = this.data;
 
     // 如果是第一次更新或者跨天了，重置lastUpdateTime
     if (!lastUpdateTime || !this.isSameDay(new Date(lastUpdateTime), now)) {
@@ -341,30 +359,55 @@ Page({
     // 计算时间差（秒）
     const timeDiff = (now.getTime() - lastUpdateTime) / 1000;
 
+    // 如果时间差异常（大于10秒），可能是有问题，记录警告
+    if (timeDiff > 10) {
+      console.warn('[updateEarnings] 时间差异常:', timeDiff, '秒', {
+        secondSalary,
+        oldTotal: this.data.actualTodayTotal.toFixed(2)
+      });
+    }
+
     // 计算增量
     const increment = secondSalary * timeDiff;
 
-    // 更新总收入
-    const currentTotal = parseFloat(this.data.todayEarned.integer + '.' + this.data.todayEarned.decimal);
-    const newTotal = currentTotal + increment;
-    const parts = newTotal.toFixed(2).split('.');
+    // 更新实际今日总额（不受维度影响）
+    const newActualTotal = this.data.actualTodayTotal + increment;
 
-    this.setData({
-      todayEarned: {
-        integer: parts[0],
-        decimal: parts[1]
-      },
-      lastUpdateTime: now.getTime()
-    });
+    // 如果当前在"日"维度，同步更新显示
+    if (dimensionTab === 'day') {
+      const parts = newActualTotal.toFixed(2).split('.');
+      this.setData({
+        todayEarned: {
+          integer: parts[0],
+          decimal: parts[1]
+        },
+        actualTodayTotal: newActualTotal,
+        lastUpdateTime: now.getTime()
+      });
+    } else {
+      // 其他维度只更新实际总额，不更新显示
+      this.setData({
+        actualTodayTotal: newActualTotal,
+        lastUpdateTime: now.getTime()
+      });
+    }
 
-    // 更新各模式统计
-    const stats = { ...this.data.stats };
-    stats[currentMode] = (stats[currentMode] || 0) + increment;
+    // 更新实际今日各模式统计
+    const actualStats = { ...this.data.actualTodayStats };
+    actualStats[currentMode] = (actualStats[currentMode] || 0) + increment;
 
-    this.setData({ stats });
-
-    // 更新统计小时数
-    this.updateStatsHours(stats);
+    // 如果在"日"维度，同步更新显示的统计
+    if (dimensionTab === 'day') {
+      this.setData({
+        actualTodayStats: actualStats,
+        stats: actualStats
+      });
+      // 更新统计小时数
+      this.updateStatsHours(actualStats);
+    } else {
+      // 其他维度只更新实际统计
+      this.setData({ actualTodayStats: actualStats });
+    }
 
     // 更新激活愿望的进度
     this.updateActiveWishProgress(increment);
@@ -497,13 +540,15 @@ Page({
 
   // 保存当前收入
   saveCurrentEarnings() {
-    const total = parseFloat(this.data.todayEarned.integer + '.' + this.data.todayEarned.decimal);
+    // 使用实际今日数据，而不是显示的数据（可能是周/月的数据）
+    const total = this.data.actualTodayTotal;
+    const stats = this.data.actualTodayStats;
 
     StorageManager.saveTodayEarnings({
       total,
-      normal: this.data.stats.normal,
-      burnout: this.data.stats.burnout,
-      slack: this.data.stats.slack
+      normal: stats.normal,
+      burnout: stats.burnout,
+      slack: stats.slack
     });
   },
 
@@ -532,13 +577,22 @@ Page({
 
     if (dimension === 'day') {
       earnings = StorageManager.getTodayEarnings();
+      // 切回"日"维度时，同步实际今日数据
+      this.setData({
+        actualTodayTotal: earnings.total || 0,
+        actualTodayStats: {
+          normal: earnings.normal || 0,
+          burnout: earnings.burnout || 0,
+          slack: earnings.slack || 0
+        }
+      });
     } else if (dimension === 'week') {
       earnings = StorageManager.getWeekEarnings();
     } else if (dimension === 'month') {
       earnings = StorageManager.getMonthEarnings();
     }
 
-    // 更新显示的金额
+    // 更新显示的金额和统计
     const total = earnings.total || 0;
     const parts = total.toFixed(2).split('.');
     const stats = {
@@ -745,5 +799,28 @@ Page({
       title: `已切换到${modeNames[mode]}`,
       icon: 'none'
     });
+  },
+
+  // 验证数据一致性（开发调试用）
+  validateDataConsistency() {
+    const todayEarnings = StorageManager.getTodayEarnings();
+    const history = wx.getStorageSync('todayEarnings_history') || {};
+    const todayKey = StorageManager.getTodayKey();
+
+    // 检查今天的数据是否在历史记录中，且值是否一致
+    if (history[todayKey]) {
+      const historyTotal = history[todayKey].total || 0;
+      const currentTotal = todayEarnings.total || 0;
+
+      // 如果差异超过0.1元，说明可能存在数据不一致
+      if (Math.abs(historyTotal - currentTotal) > 0.1) {
+        console.warn('数据不一致检测:', {
+          historyTotal,
+          currentTotal,
+          difference: Math.abs(historyTotal - currentTotal)
+        });
+      }
+    }
   }
 });
+

@@ -23,7 +23,13 @@ Page({
           endTime: '18:00'
         }
       ],
-      firstWorkDate: '' // 首次工作日期（YYYY-MM格式）
+      firstWorkDate: (() => {
+        // 默认为今天的年月
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        return `${year}-${month}`;
+      })()
     },
     weekdays: [
       { label: '一', value: 1, selected: true },
@@ -55,6 +61,11 @@ Page({
       }
       // 首次设置，从步骤0开始（月薪设置）
       this.setData({ step: 0 });
+
+      // 首次设置模式：隐藏左上角的home按钮
+      if (wx.hideHomeButton) {
+        wx.hideHomeButton();
+      }
     } else {
       // 编辑模式：加载已有配置
       const config = StorageManager.getUserConfig();
@@ -72,6 +83,12 @@ Page({
         if (firstWorkDate) {
           const parts = firstWorkDate.split('-');
           firstWorkYearMonth = `${parts[0]}-${parts[1]}`;
+        } else if (targetStep === 3) {
+          // 如果是编辑工龄且没有设置过，默认为今天的年月
+          const today = new Date();
+          const year = today.getFullYear();
+          const month = String(today.getMonth() + 1).padStart(2, '0');
+          firstWorkYearMonth = `${year}-${month}`;
         }
 
         this.setData({

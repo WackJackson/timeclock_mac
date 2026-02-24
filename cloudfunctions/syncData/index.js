@@ -38,6 +38,10 @@ exports.main = async (event, context) => {
         // 智能同步（合并数据）
         return await syncData(openid, data);
 
+      case 'delete':
+        // 删除云端数据
+        return await deleteData(openid);
+
       default:
         return {
           success: false,
@@ -267,4 +271,36 @@ function getEarliestDate(date1, date2) {
   const d2 = new Date(date2);
 
   return d1 < d2 ? date1 : date2;
+}
+
+// 删除云端数据
+async function deleteData(openid) {
+  try {
+    // 验证 openid
+    if (!openid || openid === 'undefined' || openid === 'null') {
+      throw new Error('无效的 openid');
+    }
+
+    // 查询用户数据记录（按 openid 查询）
+    const userDataQuery = await db.collection('user_data').where({
+      _openid: openid
+    }).limit(1).get();
+
+    if (userDataQuery.data.length === 0) {
+      return {
+        success: true,
+        message: '云端无数据，无需删除'
+      };
+    }
+
+    // 删除用户数据
+    await db.collection('user_data').doc(userDataQuery.data[0]._id).remove();
+
+    return {
+      success: true,
+      message: '云端数据已删除'
+    };
+  } catch (err) {
+    throw new Error('删除数据失败: ' + err.message);
+  }
 }

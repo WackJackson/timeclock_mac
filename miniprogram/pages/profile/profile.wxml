@@ -166,6 +166,14 @@
     <t-cell-group theme="card">
       <t-cell
         wx:if="{{userInfo.isLogin}}"
+        title="清空云端数据"
+        arrow
+        left-icon="🗑️"
+        hover
+        bindtap="clearCloudData"
+      />
+      <t-cell
+        wx:if="{{userInfo.isLogin}}"
         title="退出登录"
         arrow
         left-icon="⎋"

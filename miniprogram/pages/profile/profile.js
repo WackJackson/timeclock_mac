@@ -363,17 +363,28 @@ Page({
   calculateTotalStats() {
     // 从收入历史记录中获取数据
     const earningsHistory = wx.getStorageSync('todayEarnings_history') || {};
-    const recordDays = Object.keys(earningsHistory).length;
+    const todayKey = StorageManager.getTodayKey();
 
-    // 计算累计收入（从历史记录）
+    // 计算累计收入
     let totalEarned = 0;
-    Object.values(earningsHistory).forEach(dayEarnings => {
-      totalEarned += parseFloat(dayEarnings.total || 0);
+
+    // 遍历所有历史记录，但跳过今天的数据（今天的要用最新的）
+    Object.entries(earningsHistory).forEach(([dateKey, dayEarnings]) => {
+      if (dateKey !== todayKey) {
+        // 历史数据（非今天）
+        totalEarned += parseFloat(dayEarnings.total || 0);
+      }
     });
 
-    // 加上今天的收入（可能还没保存到历史记录）
+    // 加上今天的最新数据（从 todayEarnings 读取，而不是 history）
     const todayEarnings = StorageManager.getTodayEarnings();
     totalEarned += parseFloat(todayEarnings.total || 0);
+
+    // 记录天数（如果今天有数据但history中没有，天数+1）
+    let recordDays = Object.keys(earningsHistory).length;
+    if (todayEarnings.total > 0 && !earningsHistory[todayKey]) {
+      recordDays += 1;
+    }
 
     this.setData({
       recordDays: recordDays,
@@ -608,6 +619,93 @@ Page({
       content: '工作时薪观察器 v1.0.0\n\n一款帮助打工人实时观察工作收入的小工具',
       showCancel: false,
       confirmText: '知道了'
+    });
+  },
+
+  // 清空云端数据
+  clearCloudData() {
+    const that = this;
+    wx.showModal({
+      title: '确认清空云端数据？',
+      content: '将删除云端保存的所有数据（收入记录、愿望、配置等），本地数据不受影响。此操作不可恢复！',
+      confirmText: '确认清空',
+      cancelText: '取消',
+      confirmColor: '#e34d59',
+      success: async (res) => {
+        if (res.confirm) {
+          wx.showLoading({
+            title: '清空中...',
+            mask: true
+          });
+
+          try {
+            // 调用云函数删除云端数据
+            const result = await wx.cloud.callFunction({
+              name: 'syncData',
+              data: {
+                action: 'delete'
+              }
+            });
+
+            wx.hideLoading();
+
+            if (result.result.success) {
+              wx.showToast({
+                title: '云端数据已清空',
+                icon: 'success'
+              });
+            } else {
+              throw new Error(result.result.error || '清空失败');
+            }
+          } catch (err) {
+            wx.hideLoading();
+            console.error('清空云端数据失败:', err);
+            wx.showModal({
+              title: '清空失败',
+              content: err.message || '请检查网络连接',
+              showCancel: false
+            });
+          }
+        }
+      }
+    });
+  },
+
+  // 调试：查看存储数据
+  debugStorage() {
+    const todayEarnings = StorageManager.getTodayEarnings();
+    const history = wx.getStorageSync('todayEarnings_history') || {};
+    const todayKey = StorageManager.getTodayKey();
+
+    let msg = `=== 数据调试 ===\n`;
+    msg += `今天日期: ${todayKey}\n\n`;
+    msg += `todayEarnings.total: ${todayEarnings.total || 0}\n\n`;
+    msg += `history记录:\n`;
+    Object.entries(history).forEach(([date, data]) => {
+      msg += `${date}: ${data.total || 0}元\n`;
+    });
+
+    console.log(msg);
+    wx.showModal({
+      title: '存储数据',
+      content: msg,
+      showCancel: true,
+      cancelText: '关闭',
+      confirmText: '清除今日旧数据',
+      success: (res) => {
+        if (res.confirm) {
+          // 清除history中今天的旧数据
+          delete history[todayKey];
+          wx.setStorageSync('todayEarnings_history', history);
+          wx.showToast({
+            title: '已清除今日旧数据',
+            icon: 'success'
+          });
+          setTimeout(() => {
+            this.loadUserData();
+          }, 1500);
+        }
+      }
     });
   }
 });
