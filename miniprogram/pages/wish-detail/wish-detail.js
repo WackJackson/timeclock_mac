@@ -258,9 +258,16 @@ Page({
       return [];
     }
 
-    // 获取时薪设置
+    // 获取时薪配置
     const userConfig = StorageManager.getUserConfig();
-    const hourlyRate = userConfig ? parseFloat(userConfig.hourlyRate || 0) : 0;
+    const SalaryCalculator = require('../../utils/salary-calculator.js');
+
+    // 计算时薪（秒薪 * 3600）
+    let hourlyRate = 0;
+    if (userConfig) {
+      const salaryData = SalaryCalculator.getCurrentMonthSalary(userConfig);
+      hourlyRate = salaryData.secondSalary * 3600;
+    }
 
     // 按模式汇总金额和时长
     const modeStats = {

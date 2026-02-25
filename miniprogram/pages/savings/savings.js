@@ -28,6 +28,11 @@ Page({
     // 每次显示页面时重新加载，以便更新数据
     this.loadWishes();
 
+    // 先清除已有的定时器，防止重复创建
+    if (this.data.refreshTimer) {
+      clearInterval(this.data.refreshTimer);
+    }
+
     // 启动定时刷新（每2秒刷新一次）
     this.data.refreshTimer = setInterval(() => {
       this.loadWishes();

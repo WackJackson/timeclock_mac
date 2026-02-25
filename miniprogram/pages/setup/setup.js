@@ -2,8 +2,9 @@ const { StorageManager } = require('../../utils/storage-manager.js');
 
 Page({
   data: {
-    step: 0, // 从步骤0开始（月薪设置）
+    step: -1, // -1: 欢迎页, 0-3: 设置步骤
     isEditMode: false,
+    isLogging: false,
     formData: {
       salary: '15000',
       workdays: [1, 2, 3, 4, 5], // 0-6 表示周日到周六
@@ -59,15 +60,18 @@ Page({
         });
         return;
       }
-      // 首次设置，从步骤0开始（月薪设置）
-      this.setData({ step: 0 });
+      // 首次设置，从欢迎页（步骤-1）开始
+      this.setData({ step: -1 });
 
       // 首次设置模式：隐藏左上角的home按钮
       if (wx.hideHomeButton) {
         wx.hideHomeButton();
       }
     } else {
-      // 编辑模式：加载已有配置
+      // 编辑模式：直接跳转到指定步骤
+      this.setData({ step: targetStep, isEditMode: true });
+
+      // 加载已有配置
       const config = StorageManager.getUserConfig();
       if (config) {
         // 更新weekdays的selected状态
@@ -96,9 +100,7 @@ Page({
             ...config,
             firstWorkDate: firstWorkYearMonth
           },
-          weekdays: weekdays,
-          isEditMode: true,
-          step: targetStep // 编辑模式直接使用传入的步骤号
+          weekdays: weekdays
         });
       }
     }
@@ -300,6 +302,12 @@ Page({
 
   // 下一步
   nextStep() {
+    // 欢迎页直接进入设置（步骤-1 -> 步骤0）
+    if (this.data.step === -1) {
+      this.setData({ step: 0 });
+      return;
+    }
+
     // 验证当前步骤
     if (!this.validateStep()) {
       return;
@@ -318,6 +326,9 @@ Page({
       this.setData({
         step: this.data.step - 1
       });
+    } else if (this.data.step === 0) {
+      // 返回欢迎页
+      this.setData({ step: -1 });
     }
   },
 
@@ -451,6 +462,97 @@ Page({
         title: '保存失败，请重试',
         icon: 'none'
       });
+    }
+  },
+
+  // 从欢迎页登录
+  async handleLoginFromWelcome() {
+    this.setData({ isLogging: true });
+
+    try {
+      // 调用云函数登录
+      const cloudResult = await wx.cloud.callFunction({
+        name: 'login',
+        data: {
+          nickName: '微信用户',
+          avatarUrl: ''
+        }
+      });
+
+      if (cloudResult.result.success) {
+        const userInfo = {
+          isLogin: true,
+          nickName: '微信用户',
+          avatarUrl: '',
+          openid: cloudResult.result.openid
+        };
+
+        StorageManager.saveUserInfo(userInfo);
+
+        // 保存到全局数据
+        const app = getApp();
+        app.globalData.openid = cloudResult.result.openid;
+
+        // 检查是否有云端数据
+        await this.syncCloudData(userInfo);
+
+        wx.showToast({
+          title: '登录成功',
+          icon: 'success'
+        });
+
+        this.setData({ isLogging: false });
+      } else {
+        throw new Error(cloudResult.result.error || '登录失败');
+      }
+    } catch (err) {
+      this.setData({ isLogging: false });
+      console.error('登录失败:', err);
+      wx.showToast({
+        title: '登录失败，请重试',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 同步云端数据
+  async syncCloudData(userInfo) {
+    try {
+      // 尝试从云端下载数据
+      const result = await StorageManager.downloadFromCloud();
+
+      if (result.success && result.hasData) {
+        // 数据已经在 downloadFromCloud 中恢复了
+        // 设置 hasSetup 为 true，这样可以跳过首页的设置检查
+        wx.setStorageSync('hasSetup', true);
+
+        // 有云端数据，恢复数据到本地
+        wx.showModal({
+          title: '恢复数据',
+          content: '检测到您在云端保存了数据，是否恢复？',
+          confirmText: '恢复',
+          cancelText: '跳过',
+          success: (res) => {
+            if (res.confirm) {
+              // 跳转到首页
+              wx.switchTab({
+                url: '/pages/home/home'
+              });
+            } else {
+              // 跳过恢复，删除已恢复的数据，开始设置
+              wx.setStorageSync('hasSetup', false);
+              this.setData({ step: 0 });
+            }
+          }
+        });
+      } else {
+        // 没有云端数据，直接开始设置
+        this.setData({ step: 0 });
+      }
+    } catch (err) {
+      console.error('同步云端数据失败:', err);
+      // 同步失败，直接开始设置
+      this.setData({ step: 0 });
     }
   }
 });
