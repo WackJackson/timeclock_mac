@@ -270,7 +270,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16rpx;
+  gap: 8rpx;
   margin-bottom: 16rpx;
 }
 
