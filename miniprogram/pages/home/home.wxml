@@ -39,12 +39,24 @@
   <!-- 核心金额展示 -->
   <view class="money-display">
     <view class="float-icon" wx:if="{{!isWorking}}">🌸</view>
-    <text class="display-label">{{dimensionTab === 'day' ? '今日已赚' : dimensionTab === 'week' ? '本周已赚' : '本月已赚'}}</text>
-    <view class="money-amount {{isWorking ? 'money-pulse' : ''}}">
-      <text class="amount-main">¥{{todayEarned.integer}}</text>
-      <text class="amount-decimal">.{{todayEarned.decimal}}</text>
+    <view class="display-label-wrapper">
+      <text class="display-label">{{dimensionTab === 'day' ? '今日已赚' : dimensionTab === 'week' ? '本周已赚' : '本月已赚'}}</text>
+      <image
+        class="eye-icon"
+        bindtap="toggleAmountVisibility"
+        src="{{isAmountVisible ? '/images/open_eye.png' : '/images/close_eye.png'}}"
+        mode="aspectFit"
+      />
     </view>
-    <text class="display-sub" wx:if="{{isWorking}}">本月秒薪: ¥{{secondSalary}} / 秒</text>
+    <view class="money-amount {{isWorking ? 'money-pulse' : ''}}">
+      <block wx:if="{{isAmountVisible}}">
+        <text class="amount-main">¥{{todayEarned.integer}}</text>
+        <text class="amount-decimal">.{{todayEarned.decimal}}</text>
+      </block>
+      <text class="amount-masked" wx:else>¥***</text>
+    </view>
+    <text class="display-sub" wx:if="{{isWorking && isAmountVisible}}">本月秒薪: ¥{{secondSalary}} / 秒</text>
+    <text class="display-sub" wx:if="{{isWorking && !isAmountVisible}}">本月秒薪: ¥**** / 秒</text>
     <text class="display-sub" wx:if="{{!isWorking}}">{{restMessage}}</text>
   </view>
 

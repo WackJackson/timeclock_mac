@@ -12,6 +12,9 @@ Page({
     currentSegment: '',
     currentMode: 'normal',
 
+    // 金额可见性控制
+    isAmountVisible: true,
+
     // 薪资数据
     secondSalary: 0,
     todayEarned: {
@@ -67,10 +70,19 @@ Page({
     timer: null,
 
     // 上次更新时间（用于计算增量）
-    lastUpdateTime: null
+    lastUpdateTime: null,
+
+    // 保存计数器（每10次即10秒保存一次）
+    saveCounter: 0
   },
 
   onLoad() {
+    // 加载金额可见性状态
+    const isAmountVisible = wx.getStorageSync('isAmountVisible');
+    if (isAmountVisible !== '') {
+      this.setData({ isAmountVisible });
+    }
+
     // 加载用户配置
     this.loadConfig();
 
@@ -412,9 +424,11 @@ Page({
     // 更新激活愿望的进度
     this.updateActiveWishProgress(increment);
 
-    // 每10秒保存一次数据
-    if (Math.floor(now.getTime() / 1000) % 10 === 0) {
+    // 每10秒保存一次数据（使用计数器更可靠）
+    this.data.saveCounter++;
+    if (this.data.saveCounter >= 10) {
       this.saveCurrentEarnings();
+      this.data.saveCounter = 0;
     }
   },
 
@@ -808,6 +822,8 @@ Page({
     const todayKey = StorageManager.getTodayKey();
 
     // 检查今天的数据是否在历史记录中，且值是否一致
+    // 注意：今天的数据默认不会保存到 history 中，只有在特定时机才会保存
+    // 因此出现差异警告是正常现象，不必过于担心
     if (history[todayKey]) {
       const historyTotal = history[todayKey].total || 0;
       const currentTotal = todayEarnings.total || 0;
@@ -817,10 +833,22 @@ Page({
         console.warn('数据不一致检测:', {
           historyTotal,
           currentTotal,
-          difference: Math.abs(historyTotal - currentTotal)
+          difference: Math.abs(historyTotal - currentTotal),
+          note: '这可能是正常的，因为今天的数据可能还未同步到 history'
         });
       }
     }
+  },
+
+  // 切换金额可见性
+  toggleAmountVisibility() {
+    const newVisibility = !this.data.isAmountVisible;
+    this.setData({
+      isAmountVisible: newVisibility
+    });
+
+    // 保存到本地存储
+    wx.setStorageSync('isAmountVisible', newVisibility);
   }
 });
 

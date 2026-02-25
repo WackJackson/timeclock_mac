@@ -1,12 +1,42 @@
 <view class="setup-container">
-  <!-- 头部（仅首次设置时显示） -->
-  <view class="header" wx:if="{{!isEditMode}}">
+  <!-- 欢迎页（步骤-1） -->
+  <view class="welcome-page" wx:if="{{step === -1 && !isEditMode}}">
+    <view class="welcome-content">
+      <text class="welcome-title">欢迎使用</text>
+      <text class="welcome-subtitle">工作时薪观察器</text>
+      <text class="welcome-desc">实时观察你的打工收益，<text class="highlight">每分每秒</text>都在赚钱</text>
+    </view>
+
+    <view class="welcome-actions">
+      <button
+        class="new-user-btn"
+        bindtap="nextStep"
+      >
+        ✨ 我是新用户
+      </button>
+      <button
+        class="old-user-btn"
+        bindtap="handleLoginFromWelcome"
+        loading="{{isLogging}}"
+        disabled="{{isLogging}}"
+      >
+        {{isLogging ? '登录中...' : '👋 已是老朋友'}}
+      </button>
+    </view>
+
+    <view class="welcome-hint">
+      <text>换设备使用？登录可恢复之前的数据</text>
+    </view>
+  </view>
+
+  <!-- 头部（仅首次设置时显示，不包含欢迎页） -->
+  <view class="header" wx:if="{{!isEditMode && step >= 0}}">
     <text class="title">欢迎使用</text>
     <text class="subtitle">完成设置后开启你的时薪观察之旅</text>
   </view>
 
   <!-- 进度指示器（仅首次设置时显示） -->
-  <view class="progress-indicator" wx:if="{{!isEditMode}}">
+  <view class="progress-indicator" wx:if="{{!isEditMode && step >= 0}}">
     <view class="progress-bars">
       <view class="progress-bar {{step >= 0 ? 'active' : ''}}"></view>
       <view class="progress-bar {{step >= 1 ? 'active' : ''}}"></view>
@@ -16,8 +46,8 @@
     <text class="progress-text">步骤 {{step + 1}}/4</text>
   </view>
 
-  <!-- 表单内容 -->
-  <scroll-view class="form-content" scroll-y>
+  <!-- 表单内容（不包含欢迎页） -->
+  <scroll-view class="form-content" scroll-y wx:if="{{step >= 0}}">
     <!-- 步骤0: 月薪设置 -->
     <view class="form-section" wx:if="{{step === 0}}">
       <view class="form-card">
@@ -157,8 +187,8 @@
     </view>
   </scroll-view>
 
-  <!-- 底部按钮 -->
-  <view class="bottom-actions">
+  <!-- 底部按钮（不包含欢迎页） -->
+  <view class="bottom-actions" wx:if="{{step >= 0}}">
     <!-- 编辑模式：直接保存 -->
     <t-button
       wx:if="{{isEditMode}}"

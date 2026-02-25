@@ -5,7 +5,7 @@
   flex-direction: column;
   width: 100%;
   box-sizing: border-box;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* 头部 */
@@ -383,5 +383,98 @@
 
 .full-button {
   flex: 1;
+}
+
+/* 欢迎页 */
+.welcome-page {
+  padding: 80rpx 48rpx 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.welcome-content {
+  text-align: center;
+  margin-bottom: 80rpx;
+}
+
+.welcome-logo {
+  font-size: 160rpx;
+  margin-bottom: 48rpx;
+}
+
+.welcome-title {
+  display: block;
+  font-size: 56rpx;
+  font-weight: bold;
+  color: #242424;
+  margin-bottom: 16rpx;
+}
+
+.welcome-subtitle {
+  display: block;
+  font-size: 32rpx;
+  color: #666;
+  margin-bottom: 32rpx;
+}
+
+.welcome-desc {
+  display: block;
+  font-size: 28rpx;
+  color: #999;
+  line-height: 1.8;
+  white-space: nowrap;
+}
+
+.welcome-desc .highlight {
+  color: #0052d9;
+  font-weight: 500;
+}
+
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  width: 100%;
+  max-width: 400rpx;
+}
+
+.new-user-btn {
+  background: linear-gradient(135deg, #0052d9 0%, #0069ff 100%);
+  color: white;
+  border: none;
+  border-radius: 48rpx;
+  padding: 32rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  box-shadow: 0 8rpx 24rpx rgba(0, 82, 217, 0.3);
+}
+
+.old-user-btn {
+  background: transparent;
+  color: #0052d9;
+  border: 4rpx solid #0052d9;
+  border-radius: 48rpx;
+  padding: 32rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+}
+
+.old-user-btn[disabled] {
+  opacity: 0.6;
+}
+
+.welcome-hint {
+  margin-top: 48rpx;
+  text-align: center;
+}
+
+.welcome-hint text {
+  font-size: 24rpx;
+  color: #999;
 }
 

@@ -266,11 +266,29 @@
   animation: float 4s ease-in-out infinite;
 }
 
+.display-label-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
 .display-label {
-  display: block;
   font-size: 24rpx;
   opacity: 0.7;
-  margin-bottom: 16rpx;
+}
+
+.eye-icon {
+  width: 40rpx;
+  height: 40rpx;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.eye-icon:active {
+  opacity: 1;
+  transform: scale(0.9);
 }
 
 .money-amount {
@@ -299,6 +317,13 @@
 .amount-decimal {
   font-size: 64rpx;
   font-weight: bold;
+}
+
+.amount-masked {
+  font-size: 120rpx;
+  font-weight: bold;
+  line-height: 1;
+  letter-spacing: 8rpx;
 }
 
 .display-sub {
