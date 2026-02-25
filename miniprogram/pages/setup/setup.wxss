@@ -322,6 +322,15 @@
   box-sizing: border-box;
 }
 
+.privacy-hint {
+  display: block;
+  text-align: center;
+  font-size: 22rpx;
+  color: #999;
+  line-height: 1.6;
+  margin-bottom: 24rpx;
+}
+
 /* 日期选择器 */
 .date-picker-wrapper {
   margin-bottom: 16rpx;

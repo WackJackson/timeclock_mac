@@ -189,6 +189,9 @@
 
   <!-- 底部按钮（不包含欢迎页） -->
   <view class="bottom-actions" wx:if="{{step >= 0}}">
+    <!-- 隐私提示（仅首次设置时显示） -->
+    <text class="privacy-hint" wx:if="{{!isEditMode}}">我们关注您的隐私安全，您的信息将被严格保密。</text>
+
     <!-- 编辑模式：直接保存 -->
     <t-button
       wx:if="{{isEditMode}}"
