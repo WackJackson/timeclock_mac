@@ -8,7 +8,21 @@
 .header {
   background: white;
   padding: 32rpx 48rpx 48rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  padding-top: env(safe-area-inset-top);
+}
+
+/* 自定义导航栏 */
+.custom-nav-bar {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80rpx;
+  margin-bottom: 40rpx;
+}
+
+.header-content {
+  /* 原有内容 */
 }
 
 .header-title {
@@ -27,10 +41,10 @@
 .total-progress-card {
   margin-top: 32rpx;
   padding: 32rpx;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(165deg, #4a6fa5 0%, #7fa4c3 40%, #a8c5da 100%);
   border-radius: 32rpx;
   color: white;
-  box-shadow: 0 16rpx 40rpx rgba(59, 130, 246, 0.3);
+  box-shadow: 0 16rpx 40rpx rgba(79, 164, 195, 0.3);
 }
 
 .total-label {

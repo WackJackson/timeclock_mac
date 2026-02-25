@@ -21,6 +21,14 @@
     <view class="cloud cloud-2"></view>
   </view>
 
+  <!-- 普通模式装饰 - 微光粒子 -->
+  <view class="particles" wx:if="{{isWorking && currentMode === 'normal'}}">
+    <view class="particle particle-1"></view>
+    <view class="particle particle-2"></view>
+    <view class="particle particle-3"></view>
+    <view class="particle particle-4"></view>
+  </view>
+
   <!-- 摸鱼模式装饰 - 气泡 -->
   <view class="bubbles" wx:if="{{isWorking && currentMode === 'slack'}}">
     <view class="bubble bubble-1"></view>

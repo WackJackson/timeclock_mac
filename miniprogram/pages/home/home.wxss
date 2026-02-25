@@ -24,8 +24,9 @@
 }
 
 /* 背景渐变 - 根据模式切换 */
+/* 普通模式 - 晨光专注：清晨天空的平静渐变 */
 .working-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f64f59 100%);
+  background: linear-gradient(165deg, #4a6fa5 0%, #7fa4c3 40%, #a8c5da 100%);
   color: white;
 }
 
@@ -137,6 +138,67 @@
 @keyframes float {
   0%, 100% { transform: translateY(0) translateX(0); }
   50% { transform: translateY(-20rpx) translateX(20rpx); }
+}
+
+/* 微光粒子装饰 - 普通模式 */
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  animation: particle-float 6s ease-in-out infinite;
+}
+
+.particle-1 {
+  width: 20rpx;
+  height: 20rpx;
+  left: 15%;
+  top: 30%;
+  animation-delay: 0s;
+}
+
+.particle-2 {
+  width: 15rpx;
+  height: 15rpx;
+  right: 20%;
+  top: 50%;
+  animation-delay: 2s;
+}
+
+.particle-3 {
+  width: 25rpx;
+  height: 25rpx;
+  left: 60%;
+  top: 20%;
+  animation-delay: 4s;
+}
+
+.particle-4 {
+  width: 18rpx;
+  height: 18rpx;
+  left: 35%;
+  top: 60%;
+  animation-delay: 3s;
+}
+
+@keyframes particle-float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-30rpx) translateX(20rpx);
+    opacity: 0.7;
+  }
 }
 
 /* 气泡装饰 - 摸鱼模式 */

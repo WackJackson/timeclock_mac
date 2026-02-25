@@ -7,7 +7,7 @@
 /* 登录引导界面 */
 .login-guide {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(165deg, #4a6fa5 0%, #7fa4c3 40%, #a8c5da 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,7 +47,7 @@
   width: 100%;
   height: 88rpx;
   line-height: 88rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(165deg, #4a6fa5 0%, #7fa4c3 40%, #a8c5da 100%);
   color: white;
   font-size: 32rpx;
   font-weight: bold;
@@ -63,8 +63,25 @@
 
 /* 头部 */
 .profile-header {
-  background: linear-gradient(135deg, #0052d9 0%, #667eea 100%);
+  background: linear-gradient(165deg, #4a6fa5 0%, #7fa4c3 40%, #a8c5da 100%);
   padding: 96rpx 48rpx 64rpx;
+  padding-top: env(safe-area-inset-top);
+  color: white;
+}
+
+/* 自定义导航栏 */
+.custom-nav-bar {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80rpx;
+  margin-bottom: 40rpx;
+}
+
+.nav-title {
+  font-size: 32rpx;
+  font-weight: 600;
   color: white;
 }
 
@@ -211,8 +228,8 @@
 }
 
 .tab-item.active {
-  color: #0052d9;
-  border-bottom: 4rpx solid #0052d9;
+  color: #7fa4c3;
+  border-bottom: 4rpx solid #7fa4c3;
   font-weight: 500;
 }
 

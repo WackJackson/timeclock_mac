@@ -17,6 +17,10 @@
   <view wx:else>
   <!-- 头部 -->
   <view class="profile-header">
+    <!-- 自定义导航栏 -->
+    <view class="custom-nav-bar">
+    </view>
+
     <!-- 未登录状态 -->
     <view class="user-info" wx:if="{{!userInfo.isLogin}}">
       <view class="avatar">👤</view>
@@ -96,21 +100,21 @@
 
         <view class="legend-list">
           <view class="legend-item">
-            <view class="legend-dot" style="background: #0052d9;"></view>
+            <view class="legend-dot" style="background: #7fa4c3;"></view>
             <view class="legend-info">
               <text class="legend-name">普通模式</text>
               <text class="legend-detail">{{modeStats.normal.hours}}h · {{modeStats.normal.percent}}% · ¥{{modeStats.normal.amount}}</text>
             </view>
           </view>
           <view class="legend-item">
-            <view class="legend-dot" style="background: #ed7b2f;"></view>
+            <view class="legend-dot" style="background: #dc2626;"></view>
             <view class="legend-info">
               <text class="legend-name">燃尽模式</text>
               <text class="legend-detail">{{modeStats.burnout.hours}}h · {{modeStats.burnout.percent}}% · ¥{{modeStats.burnout.amount}}</text>
             </view>
           </view>
           <view class="legend-item">
-            <view class="legend-dot" style="background: #00a870;"></view>
+            <view class="legend-dot" style="background: #3b82f6;"></view>
             <view class="legend-info">
               <text class="legend-name">摸鱼模式</text>
               <text class="legend-detail">{{modeStats.slack.hours}}h · {{modeStats.slack.percent}}% · ¥{{modeStats.slack.amount}}</text>

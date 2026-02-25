@@ -1,6 +1,10 @@
 <view class="savings-container">
   <!-- 头部 -->
   <view class="header">
+    <!-- 自定义导航栏 -->
+    <view class="custom-nav-bar">
+    </view>
+
     <view class="header-content">
       <view class="header-title">攒钱观察</view>
       <view class="header-subtitle">把薪水变成看得见的梦想</view>

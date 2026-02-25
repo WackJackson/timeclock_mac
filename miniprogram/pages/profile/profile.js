@@ -505,17 +505,17 @@ Page({
     let gradient = 'background: conic-gradient(';
 
     if (normalPercent > 0) {
-      gradient += `#0052d9 0deg ${normalEnd}deg`;
+      gradient += `#7fa4c3 0deg ${normalEnd}deg`;
       if (burnoutPercent > 0 || slackPercent > 0) gradient += ', ';
     }
 
     if (burnoutPercent > 0) {
-      gradient += `#ed7b2f ${normalEnd}deg ${burnoutEnd}deg`;
+      gradient += `#dc2626 ${normalEnd}deg ${burnoutEnd}deg`;
       if (slackPercent > 0) gradient += ', ';
     }
 
     if (slackPercent > 0) {
-      gradient += `#00a870 ${burnoutEnd}deg ${slackEnd}deg`;
+      gradient += `#3b82f6 ${burnoutEnd}deg ${slackEnd}deg`;
     }
 
     gradient += ');';
