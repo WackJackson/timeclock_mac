@@ -88,31 +88,73 @@
       z-index: 1;
     }
 
+    .app-icon {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 50px;
+      animation: fadeInUp 0.8s ease-out 0.1s both, iconFloat 3s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+    }
+
+    .app-icon img {
+      width: 100%;
+      height: 100%;
+      border-radius: 45px;
+    }
+
+    @keyframes iconFloat {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-15px);
+      }
+    }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .title-main {
+    .app-name {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 120px;
-      line-height: 0.95;
+      font-size: 140px;
+      line-height: 1;
       text-align: center;
-      margin-bottom: 30px;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.05em;
       animation: fadeInUp 0.8s ease-out 0.2s both;
       position: relative;
       z-index: 1;
+      margin-bottom: 20px;
+    }
+
+    .title-main {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: 48px;
+      font-weight: 400;
+      line-height: 1;
+      text-align: center;
+      margin-bottom: 30px;
+      letter-spacing: 0.05em;
+      animation: fadeInUp 0.8s ease-out 0.3s both;
+      position: relative;
+      z-index: 1;
+      opacity: 0.95;
     }
 
     .title-highlight {
-      display: block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px;
+      font-weight: 400;
+      line-height: 1;
       background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
       background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: shine 3s linear infinite;
+      animation: shine 3s linear infinite, fadeInUp 0.8s ease-out 0.4s both;
     }
 
     @keyframes shine {
@@ -592,7 +634,7 @@
     .qr-box {
       width: 360px;
       height: 360px;
-      background: linear-gradient(165deg, var(--dawn-blue-1), var(--dawn-blue-2), var(--dawn-blue-3));
+      background: white;
       border-radius: 32px;
       display: flex;
       align-items: center;
@@ -600,26 +642,13 @@
       position: relative;
       overflow: hidden;
       margin-bottom: 30px;
+      padding: 20px;
     }
 
-    .qr-box::before {
-      content: '';
-      position: absolute;
-      top: 10%;
-      left: 10%;
-      right: 10%;
-      bottom: 10%;
-      background: white;
-      border-radius: 24px;
-    }
-
-    .qr-box::after {
-      content: '扫码体验';
-      position: absolute;
-      font-size: 36px;
-      font-weight: 900;
-      color: var(--dawn-blue-1);
-      z-index: 1;
+    .qr-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .qr-label {
@@ -654,10 +683,12 @@
     <!-- 第1张：封面 -->
     <div class="slide" id="slide1">
       <div class="badge">微信小程序</div>
-      <h1 class="title-main">
-        工作时薪观察器
-        <span class="title-highlight">每分每秒都在赚钱</span>
-      </h1>
+      <div class="app-icon">
+        <img src="file:///Users/zhangyafei1/Desktop/app_icon.png" alt="好摸图标">
+      </div>
+      <h1 class="app-name">好摸</h1>
+      <h2 class="title-main">工作时薪观察器</h2>
+      <h3 class="title-highlight">每分每秒都在赚钱</h3>
       <p class="subtitle-main">
         实时计算工作收入<br/>
         让每一秒的付出都清晰可见
@@ -704,21 +735,21 @@
           <span class="mode-emoji">⚡</span>
           <div class="mode-info">
             <div class="mode-name">普通模式</div>
-            <div class="mode-desc">标准工作状态，正常薪资计算</div>
+            <div class="mode-desc">认真搬砖，正常赚钱</div>
           </div>
         </div>
         <div class="mode-card burnout">
           <span class="mode-emoji">🔥</span>
           <div class="mode-info">
             <div class="mode-name">燃尽模式</div>
-            <div class="mode-desc">高强度工作，2倍薪资计算</div>
+            <div class="mode-desc">卷王模式，燃烧自己照亮老板</div>
           </div>
         </div>
         <div class="mode-card slack">
           <span class="mode-emoji">🐟</span>
           <div class="mode-info">
             <div class="mode-name">摸鱼模式</div>
-            <div class="mode-desc">放松休息，0.5倍薪资计算</div>
+            <div class="mode-desc">带薪拉屎，光明正大偷懒</div>
           </div>
         </div>
       </div>
@@ -820,8 +851,10 @@
         </h2>
         <p class="cta-subtitle">微信扫码 · 立即体验</p>
         <div class="qr-container">
-          <div class="qr-box"></div>
-          <div class="qr-label">工作时薪观察器</div>
+          <div class="qr-box">
+            <img src="file:///Users/zhangyafei1/Desktop/code.jpg" alt="小程序码">
+          </div>
+          <div class="qr-label">好摸 · 工作时薪观察器</div>
         </div>
         <p class="cta-note">让每一分每一秒的努力都被看见</p>
       </div>
