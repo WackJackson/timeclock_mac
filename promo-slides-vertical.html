@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工作时薪观察器 - 宣传图 3:4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700;900&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dawn-blue-1: #4a6fa5;
+      --dawn-blue-2: #7fa4c3;
+      --dawn-blue-3: #a8c5da;
+      --burnout-red: #dc2626;
+      --slack-blue: #3b82f6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .slides-container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .slide {
+      width: 900px;
+      height: 1200px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 0;
+    }
+
+    /* 第1张 - 封面 */
+    #slide1 {
+      background: linear-gradient(165deg, var(--dawn-blue-1) 0%, var(--dawn-blue-2) 40%, var(--dawn-blue-3) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      padding: 80px 60px;
+      position: relative;
+    }
+
+    #slide1::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 100%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -30px) rotate(5deg); }
+      66% { transform: translate(-20px, 20px) rotate(-5deg); }
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 12px 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50px;
+      font-size: 18px;
+      letter-spacing: 3px;
+      margin-bottom: 40px;
+      backdrop-filter: blur(10px);
+      animation: fadeInUp 0.8s ease-out;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .title-main {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 120px;
+      line-height: 0.95;
+      text-align: center;
+      margin-bottom: 30px;
+      letter-spacing: 0.02em;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+      position: relative;
+      z-index: 1;
+    }
+
+    .title-highlight {
+      display: block;
+      background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shine 3s linear infinite;
+    }
+
+    @keyframes shine {
+      to { background-position: 200% center; }
+    }
+
+    .subtitle-main {
+      font-size: 32px;
+      text-align: center;
+      opacity: 0.95;
+      margin-bottom: 60px;
+      line-height: 1.5;
+      animation: fadeInUp 0.8s ease-out 0.4s both;
+      position: relative;
+      z-index: 1;
+    }
+
+    .counter-box {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 32px;
+      padding: 60px;
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out 0.6s both;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
+    }
+
+    .counter-label {
+      font-size: 20px;
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    .counter-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 80px;
+      font-weight: 900;
+      text-shadow: 0 0 40px rgba(251, 191, 36, 0.6);
+      margin-bottom: 15px;
+    }
+
+    .counter-note {
+      font-size: 16px;
+      opacity: 0.8;
+      line-height: 1.6;
+    }
+
+    /* 第2张 - 实时计算 */
+    #slide2 {
+      background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+      display: flex;
+      flex-direction: column;
+      padding: 80px 60px;
+    }
+
+    .slide-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    .slide-tag {
+      display: inline-block;
+      padding: 10px 28px;
+      background: var(--dawn-blue-2);
+      color: white;
+      border-radius: 50px;
+      font-size: 16px;
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+
+    .slide-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 96px;
+      line-height: 0.95;
+      color: #1a1a1a;
+      margin-bottom: 30px;
+      letter-spacing: 0.02em;
+    }
+
+    .slide-desc {
+      font-size: 28px;
+      color: #666;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .feature-visual {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .money-card {
+      background: linear-gradient(165deg, var(--dawn-blue-1), var(--dawn-blue-2), var(--dawn-blue-3));
+      border-radius: 48px;
+      padding: 80px 60px;
+      color: white;
+      text-align: center;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .money-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .money-status {
+      font-size: 24px;
+      margin-bottom: 30px;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .money-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 120px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      text-shadow: 0 0 60px rgba(255, 255, 255, 0.5);
+      position: relative;
+      z-index: 1;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .money-label {
+      font-size: 28px;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 第3张 - 三种模式 */
+    #slide3 {
+      background: linear-gradient(180deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+      display: flex;
+      flex-direction: column;
+      padding: 80px 60px;
+    }
+
+    .modes-grid {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      justify-content: center;
+    }
+
+    .mode-card {
+      border-radius: 32px;
+      padding: 50px 40px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .mode-card.normal {
+      background: linear-gradient(135deg, var(--dawn-blue-1), var(--dawn-blue-2), var(--dawn-blue-3));
+    }
+
+    .mode-card.burnout {
+      background: linear-gradient(135deg, #7f1d1d, var(--burnout-red), #f87171);
+    }
+
+    .mode-card.slack {
+      background: linear-gradient(135deg, #1e40af, var(--slack-blue), #60a5fa);
+    }
+
+    .mode-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+      animation: rotate 15s linear infinite;
+    }
+
+    .mode-emoji {
+      font-size: 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mode-info {
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mode-name {
+      font-size: 48px;
+      font-weight: 900;
+      margin-bottom: 10px;
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 0.02em;
+    }
+
+    .mode-desc {
+      font-size: 22px;
+      opacity: 0.95;
+      line-height: 1.5;
+    }
+
+    /* 第4张 - 攒钱目标 */
+    #slide4 {
+      background: linear-gradient(180deg, #fce7f3 0%, #fbcfe8 50%, #f9a8d4 100%);
+      display: flex;
+      flex-direction: column;
+      padding: 80px 60px;
+    }
+
+    .wish-cards {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      justify-content: center;
+    }
+
+    .wish-item {
+      background: white;
+      border-radius: 32px;
+      padding: 50px 45px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+
+    .wish-top {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .wish-icon {
+      width: 100px;
+      height: 100px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--dawn-blue-2), var(--dawn-blue-3));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .wish-text {
+      flex: 1;
+    }
+
+    .wish-name {
+      font-size: 36px;
+      font-weight: 900;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .wish-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--dawn-blue-1);
+    }
+
+    .progress-container {
+      width: 100%;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: #f3f4f6;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--dawn-blue-1), var(--dawn-blue-2));
+      border-radius: 12px;
+      transition: width 1s ease;
+    }
+
+    .progress-text {
+      font-size: 20px;
+      color: #666;
+      text-align: right;
+    }
+
+    /* 第5张 - 数据统计 */
+    #slide5 {
+      background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 50%, #93c5fd 100%);
+      display: flex;
+      flex-direction: column;
+      padding: 80px 60px;
+    }
+
+    .stats-visual {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      justify-content: center;
+    }
+
+    .chart-box {
+      background: white;
+      border-radius: 32px;
+      padding: 50px 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 40px;
+    }
+
+    .donut-placeholder {
+      width: 280px;
+      height: 280px;
+      margin: 0 auto 40px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--dawn-blue-2) 0deg 245deg,
+        var(--burnout-red) 245deg 290deg,
+        var(--slack-blue) 290deg 360deg
+      );
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-center {
+      width: 180px;
+      height: 180px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--dawn-blue-1);
+    }
+
+    .donut-label {
+      font-size: 18px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .stat-box {
+      background: white;
+      border-radius: 24px;
+      padding: 35px 30px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 44px;
+      font-weight: 900;
+      color: var(--dawn-blue-1);
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 20px;
+      color: #666;
+    }
+
+    /* 第6张 - CTA */
+    #slide6 {
+      background: linear-gradient(135deg, #1a1a1a 0%, #374151 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      padding: 80px 60px;
+      position: relative;
+    }
+
+    #slide6::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        linear-gradient(45deg, transparent 30%, rgba(127, 164, 195, 0.1) 30%, rgba(127, 164, 195, 0.1) 70%, transparent 70%),
+        linear-gradient(-45deg, transparent 30%, rgba(74, 111, 165, 0.1) 30%, rgba(74, 111, 165, 0.1) 70%, transparent 70%);
+      background-size: 60px 60px;
+      opacity: 0.4;
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .cta-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 110px;
+      line-height: 1.1;
+      margin-bottom: 40px;
+      letter-spacing: 0.02em;
+    }
+
+    .cta-subtitle {
+      font-size: 36px;
+      margin-bottom: 80px;
+      opacity: 0.95;
+    }
+
+    .qr-container {
+      background: white;
+      border-radius: 40px;
+      padding: 60px;
+      display: inline-block;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+      margin-bottom: 40px;
+    }
+
+    .qr-box {
+      width: 360px;
+      height: 360px;
+      background: linear-gradient(165deg, var(--dawn-blue-1), var(--dawn-blue-2), var(--dawn-blue-3));
+      border-radius: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .qr-box::before {
+      content: '';
+      position: absolute;
+      top: 10%;
+      left: 10%;
+      right: 10%;
+      bottom: 10%;
+      background: white;
+      border-radius: 24px;
+    }
+
+    .qr-box::after {
+      content: '扫码体验';
+      position: absolute;
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--dawn-blue-1);
+      z-index: 1;
+    }
+
+    .qr-label {
+      font-size: 28px;
+      color: #1a1a1a;
+      font-weight: 700;
+    }
+
+    .cta-note {
+      font-size: 24px;
+      opacity: 0.8;
+    }
+
+    /* 提示 */
+    .nav-hint {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 15px 40px;
+      border-radius: 50px;
+      color: white;
+      font-size: 16px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div class="slides-container">
+    <!-- 第1张：封面 -->
+    <div class="slide" id="slide1">
+      <div class="badge">微信小程序</div>
+      <h1 class="title-main">
+        工作时薪观察器
+        <span class="title-highlight">每分每秒都在赚钱</span>
+      </h1>
+      <p class="subtitle-main">
+        实时计算工作收入<br/>
+        让每一秒的付出都清晰可见
+      </p>
+      <div class="counter-box">
+        <div class="counter-label">此刻你已赚取</div>
+        <div class="counter-value">¥<span id="counter1">0.00</span></div>
+        <div class="counter-note">* 按月薪 8000 元计算示例</div>
+      </div>
+    </div>
+
+    <!-- 第2张：实时薪资 -->
+    <div class="slide" id="slide2">
+      <div class="slide-header">
+        <div class="slide-tag">核心功能</div>
+        <h2 class="slide-title">实时薪资计算</h2>
+        <p class="slide-desc">
+          按秒精确计算工作收入<br/>
+          自动识别工作时段<br/>
+          每一刻的价值都清晰可见
+        </p>
+      </div>
+      <div class="feature-visual">
+        <div class="money-card">
+          <div class="money-status">⚡ 工作中 · 普通模式</div>
+          <div class="money-amount">¥<span id="counter2">86.42</span></div>
+          <div class="money-label">今日已赚</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第3张：三种模式 -->
+    <div class="slide" id="slide3">
+      <div class="slide-header">
+        <div class="slide-tag">工作模式</div>
+        <h2 class="slide-title">匹配你的真实状态</h2>
+        <p class="slide-desc">
+          不同的工作状态，不同的计薪方式<br/>
+          真实记录你的每一刻
+        </p>
+      </div>
+      <div class="modes-grid">
+        <div class="mode-card normal">
+          <span class="mode-emoji">⚡</span>
+          <div class="mode-info">
+            <div class="mode-name">普通模式</div>
+            <div class="mode-desc">标准工作状态，正常薪资计算</div>
+          </div>
+        </div>
+        <div class="mode-card burnout">
+          <span class="mode-emoji">🔥</span>
+          <div class="mode-info">
+            <div class="mode-name">燃尽模式</div>
+            <div class="mode-desc">高强度工作，2倍薪资计算</div>
+          </div>
+        </div>
+        <div class="mode-card slack">
+          <span class="mode-emoji">🐟</span>
+          <div class="mode-info">
+            <div class="mode-name">摸鱼模式</div>
+            <div class="mode-desc">放松休息，0.5倍薪资计算</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第4张：攒钱目标 -->
+    <div class="slide" id="slide4">
+      <div class="slide-header">
+        <div class="slide-tag">目标管理</div>
+        <h2 class="slide-title">攒钱目标<br/>梦想可期</h2>
+        <p class="slide-desc">
+          设定你的梦想目标<br/>
+          工作收入自动累积<br/>
+          把薪水变成看得见的进度
+        </p>
+      </div>
+      <div class="wish-cards">
+        <div class="wish-item">
+          <div class="wish-top">
+            <div class="wish-icon">🎸</div>
+            <div class="wish-text">
+              <div class="wish-name">新吉他</div>
+              <div class="wish-amount">¥2,350 / ¥3,500</div>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 67%;"></div>
+            </div>
+            <div class="progress-text">67% 完成</div>
+          </div>
+        </div>
+        <div class="wish-item">
+          <div class="wish-top">
+            <div class="wish-icon">✈️</div>
+            <div class="wish-text">
+              <div class="wish-name">日本旅行</div>
+              <div class="wish-amount">¥4,230 / ¥12,000</div>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 35%;"></div>
+            </div>
+            <div class="progress-text">35% 完成</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第5张：数据统计 -->
+    <div class="slide" id="slide5">
+      <div class="slide-header">
+        <div class="slide-tag">数据分析</div>
+        <h2 class="slide-title">多维度统计</h2>
+        <p class="slide-desc">
+          日/周/月多维度数据分析<br/>
+          工作时长、收入构成<br/>
+          模式占比一目了然
+        </p>
+      </div>
+      <div class="stats-visual">
+        <div class="chart-box">
+          <div class="chart-title">📊 本月工作统计</div>
+          <div class="donut-placeholder">
+            <div class="donut-center">
+              <div class="donut-value">156.8h</div>
+              <div class="donut-label">总时长</div>
+            </div>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-value">¥5,234</div>
+            <div class="stat-label">本月收入</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">22天</div>
+            <div class="stat-label">工作天数</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">68%</div>
+            <div class="stat-label">普通模式</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">¥0.52</div>
+            <div class="stat-label">秒薪</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第6张：CTA -->
+    <div class="slide" id="slide6">
+      <div class="cta-content">
+        <h2 class="cta-title">
+          开始观察<br/>
+          你的工作价值
+        </h2>
+        <p class="cta-subtitle">微信扫码 · 立即体验</p>
+        <div class="qr-container">
+          <div class="qr-box"></div>
+          <div class="qr-label">工作时薪观察器</div>
+        </div>
+        <p class="cta-note">让每一分每一秒的努力都被看见</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-hint">
+    💡 宽900px × 高1200px（3:4比例），共6张图，适合手机浏览
+  </div>
+
+  <script>
+    // 实时计数器
+    let counter1 = 0;
+    let counter2 = 86.42;
+    const secondSalary = (8000 / 22 / 8 / 3600);
+
+    setInterval(() => {
+      counter1 += secondSalary;
+      counter2 += secondSalary;
+      document.getElementById('counter1').textContent = counter1.toFixed(2);
+      document.getElementById('counter2').textContent = counter2.toFixed(2);
+    }, 1000);
+
+    console.log('宣传图已生成！');
+    console.log('- 3:4竖版比例（900×1200px）');
+    console.log('- 共6张图');
+    console.log('- 适合手机浏览和社交媒体发布');
+    console.log('- 请使用截图工具逐张保存');
+  </script>
+</body>
+</html>

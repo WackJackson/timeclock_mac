@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工作时薪观察器 - 每分每秒都在赚钱</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dawn-blue-1: #4a6fa5;
+      --dawn-blue-2: #7fa4c3;
+      --dawn-blue-3: #a8c5da;
+      --burnout-red: #dc2626;
+      --slack-blue: #3b82f6;
+      --text-dark: #1a1a1a;
+      --text-gray: #666;
+      --bg-light: #fafbfc;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", STHeiti, "Microsoft Yahei", Tahoma, Simsun, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(165deg, var(--dawn-blue-1) 0%, var(--dawn-blue-2) 40%, var(--dawn-blue-3) 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      padding: 4rem 2rem;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 100%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -30px) rotate(5deg); }
+      66% { transform: translate(-20px, 20px) rotate(-5deg); }
+    }
+
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 0.5rem 1.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50px;
+      color: white;
+      font-size: 0.875rem;
+      letter-spacing: 2px;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 0.95;
+      color: white;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.02em;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .hero-title .highlight {
+      display: block;
+      background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shine 3s linear infinite, fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    @keyframes shine {
+      to {
+        background-position: 200% center;
+      }
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.5rem);
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 3rem;
+      max-width: 600px;
+      line-height: 1.6;
+      animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .counter-section {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 24px;
+      padding: 3rem;
+      max-width: 500px;
+      animation: fadeInUp 0.8s ease-out 0.6s both;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .counter-label {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: 3px;
+      margin-bottom: 1rem;
+    }
+
+    .counter-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .counter-note {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+
+    /* Features Section */
+    .features {
+      padding: 8rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 6rem;
+    }
+
+    .section-tag {
+      display: inline-block;
+      padding: 0.5rem 1.5rem;
+      background: var(--dawn-blue-3);
+      color: white;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      letter-spacing: 2px;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .section-subtitle {
+      font-size: 1.125rem;
+      color: var(--text-gray);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 3rem;
+      perspective: 1000px;
+    }
+
+    .feature-card {
+      background: white;
+      border-radius: 32px;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInScale 0.6s ease-out both;
+    }
+
+    .feature-card:nth-child(1) { animation-delay: 0.1s; }
+    .feature-card:nth-child(2) { animation-delay: 0.2s; }
+    .feature-card:nth-child(3) { animation-delay: 0.3s; }
+    .feature-card:nth-child(4) { animation-delay: 0.4s; }
+    .feature-card:nth-child(5) { animation-delay: 0.5s; }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--dawn-blue-1), var(--dawn-blue-2), var(--dawn-blue-3));
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+      transform-origin: left;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .feature-icon.mode-1 {
+      background: linear-gradient(135deg, var(--dawn-blue-2), var(--dawn-blue-3));
+    }
+
+    .feature-icon.mode-2 {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+    }
+
+    .feature-icon.mode-3 {
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    }
+
+    .feature-icon.mode-4 {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+    }
+
+    .feature-icon.mode-5 {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    }
+
+    .feature-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+    }
+
+    .feature-desc {
+      font-size: 1rem;
+      color: var(--text-gray);
+      line-height: 1.7;
+    }
+
+    .feature-highlight {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: var(--dawn-blue-3);
+      color: white;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+
+    /* Modes Showcase */
+    .modes-showcase {
+      padding: 8rem 2rem;
+      background: linear-gradient(180deg, #f8fafc 0%, white 100%);
+    }
+
+    .modes-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .mode-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+
+    .mode-card {
+      border-radius: 32px;
+      padding: 3rem 2rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s ease;
+      animation: fadeInUp 0.6s ease-out both;
+    }
+
+    .mode-card:nth-child(1) {
+      background: linear-gradient(165deg, var(--dawn-blue-1), var(--dawn-blue-2), var(--dawn-blue-3));
+      animation-delay: 0.1s;
+    }
+
+    .mode-card:nth-child(2) {
+      background: linear-gradient(135deg, #7f1d1d, var(--burnout-red), #f87171);
+      animation-delay: 0.2s;
+    }
+
+    .mode-card:nth-child(3) {
+      background: linear-gradient(135deg, #1e40af, var(--slack-blue), #60a5fa);
+      animation-delay: 0.3s;
+    }
+
+    .mode-card:hover {
+      transform: translateY(-10px) scale(1.02);
+    }
+
+    .mode-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+      animation: rotate 15s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .mode-emoji {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mode-name {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mode-desc {
+      font-size: 1rem;
+      opacity: 0.9;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      padding: 8rem 2rem;
+      background: var(--text-dark);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        linear-gradient(45deg, transparent 30%, rgba(127, 164, 195, 0.1) 30%, rgba(127, 164, 195, 0.1) 70%, transparent 70%),
+        linear-gradient(-45deg, transparent 30%, rgba(74, 111, 165, 0.1) 30%, rgba(74, 111, 165, 0.1) 70%, transparent 70%);
+      background-size: 60px 60px;
+      opacity: 0.5;
+    }
+
+    .cta-content {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      color: white;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+    }
+
+    .cta-subtitle {
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 4rem;
+      line-height: 1.6;
+    }
+
+    .qr-container {
+      background: white;
+      border-radius: 32px;
+      padding: 3rem;
+      display: inline-block;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .qr-placeholder {
+      width: 240px;
+      height: 240px;
+      background: linear-gradient(135deg, var(--dawn-blue-2), var(--dawn-blue-3));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: white;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-placeholder::before {
+      content: '';
+      position: absolute;
+      top: 10%;
+      left: 10%;
+      right: 10%;
+      bottom: 10%;
+      background: white;
+      border-radius: 12px;
+    }
+
+    .qr-placeholder::after {
+      content: '扫码体验';
+      position: absolute;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--dawn-blue-1);
+      z-index: 1;
+    }
+
+    .qr-label {
+      font-size: 1rem;
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      padding: 6rem 2rem;
+      background: white;
+    }
+
+    .stats-grid {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 3rem;
+      text-align: center;
+    }
+
+    .stat-item {
+      animation: fadeInUp 0.6s ease-out both;
+    }
+
+    .stat-item:nth-child(1) { animation-delay: 0.1s; }
+    .stat-item:nth-child(2) { animation-delay: 0.2s; }
+    .stat-item:nth-child(3) { animation-delay: 0.3s; }
+
+    .stat-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--dawn-blue-1), var(--dawn-blue-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      color: var(--text-gray);
+    }
+
+    /* Footer */
+    .footer {
+      padding: 3rem 2rem;
+      background: #f8fafc;
+      text-align: center;
+      color: var(--text-gray);
+      font-size: 0.875rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero {
+        padding: 3rem 1.5rem;
+      }
+
+      .counter-section {
+        padding: 2rem;
+      }
+
+      .features {
+        padding: 4rem 1.5rem;
+      }
+
+      .features-grid {
+        gap: 2rem;
+      }
+
+      .modes-showcase {
+        padding: 4rem 1.5rem;
+      }
+
+      .cta-section {
+        padding: 4rem 1.5rem;
+      }
+
+      .qr-container {
+        padding: 2rem;
+      }
+
+      .qr-placeholder {
+        width: 200px;
+        height: 200px;
+      }
+    }
+
+    /* Scroll animations */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.8s ease-out;
+    }
+
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">微信小程序</div>
+      <h1 class="hero-title">
+        工作时薪观察器
+        <span class="highlight">每分每秒都在赚钱</span>
+      </h1>
+      <p class="hero-subtitle">
+        实时计算你的工作收入，让每一秒的付出都清晰可见。三种工作模式，智能统计分析，帮你量化工作价值。
+      </p>
+      <div class="counter-section">
+        <div class="counter-label">此刻你已赚取</div>
+        <div class="counter-display">¥<span id="counter">0.00</span></div>
+        <div class="counter-note">* 按月薪 8000 元 / 22 天 / 8 小时计算示例</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">按秒</div>
+        <div class="stat-label">实时计算薪资</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">3种</div>
+        <div class="stat-label">工作模式切换</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">多维度</div>
+        <div class="stat-label">日/周/月统计</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features scroll-reveal">
+    <div class="section-header">
+      <div class="section-tag">核心功能</div>
+      <h2 class="section-title">让工作价值可视化</h2>
+      <p class="section-subtitle">
+        从实时薪资追踪到目标管理，每个功能都为打工人精心设计
+      </p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon mode-1">⚡</div>
+        <h3 class="feature-title">实时薪资计算</h3>
+        <p class="feature-desc">
+          按秒精确计算工作收入，工作时间自动识别，让你清楚看到每一刻的价值。
+        </p>
+        <span class="feature-highlight">秒薪可见</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon mode-2">🔥</div>
+        <h3 class="feature-title">三种工作模式</h3>
+        <p class="feature-desc">
+          普通、燃尽、摸鱼三种模式自由切换，不同倍率计算，真实记录你的工作状态。
+        </p>
+        <span class="feature-highlight">模式切换</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon mode-3">🎯</div>
+        <h3 class="feature-title">攒钱目标管理</h3>
+        <p class="feature-desc">
+          设定梦想目标，工作收入自动累积，把薪水变成看得见摸得着的梦想进度。
+        </p>
+        <span class="feature-highlight">梦想可期</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon mode-4">📊</div>
+        <h3 class="feature-title">多维度统计</h3>
+        <p class="feature-desc">
+          日、周、月多维度数据分析，工作时长、收入构成、模式占比一目了然。
+        </p>
+        <span class="feature-highlight">数据分析</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon mode-5">🤖</div>
+        <h3 class="feature-title">智能工作追踪</h3>
+        <p class="feature-desc">
+          根据你的工作时段自动识别状态，无需手动打卡，专注工作即可。
+        </p>
+        <span class="feature-highlight">自动识别</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modes Showcase -->
+  <section class="modes-showcase scroll-reveal">
+    <div class="modes-container">
+      <div class="section-header">
+        <div class="section-tag">工作模式</div>
+        <h2 class="section-title">匹配你的真实状态</h2>
+        <p class="section-subtitle">
+          不同的工作状态，不同的计薪方式，真实记录你的每一刻
+        </p>
+      </div>
+      <div class="mode-cards">
+        <div class="mode-card">
+          <span class="mode-emoji">⚡</span>
+          <h3 class="mode-name">普通模式</h3>
+          <p class="mode-desc">标准工作状态，正常薪资计算，晨光专注的平静渐变，陪你度过每个认真工作的时刻。</p>
+        </div>
+        <div class="mode-card">
+          <span class="mode-emoji">🔥</span>
+          <h3 class="mode-name">燃尽模式</h3>
+          <p class="mode-desc">高强度工作状态，2倍薪资计算，燃烧的红色渐变，致敬每个拼尽全力的瞬间。</p>
+        </div>
+        <div class="mode-card">
+          <span class="mode-emoji">🐟</span>
+          <h3 class="mode-name">摸鱼模式</h3>
+          <p class="mode-desc">放松休息状态，0.5倍薪资计算，轻松的蓝色渐变，给自己一点喘息的空间。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section scroll-reveal">
+    <div class="cta-content">
+      <h2 class="cta-title">
+        开始观察你的<br>工作价值
+      </h2>
+      <p class="cta-subtitle">
+        扫描二维码，立即使用微信小程序<br>
+        让每一分每一秒的努力都被看见
+      </p>
+      <div class="qr-container">
+        <div class="qr-placeholder"></div>
+        <div class="qr-label">微信扫一扫</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>工作时薪观察器 © 2024 · 让打工更有尊严</p>
+  </footer>
+
+  <script>
+    // Counter animation
+    let counter = 0;
+    const counterElement = document.getElementById('counter');
+    const secondSalary = (8000 / 22 / 8 / 3600); // 月薪8000，22天，8小时
+
+    setInterval(() => {
+      counter += secondSalary;
+      counterElement.textContent = counter.toFixed(2);
+    }, 1000);
+
+    // Scroll reveal animation
+    const observerOptions = {
+      threshold: 0.2,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.scroll-reveal').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
